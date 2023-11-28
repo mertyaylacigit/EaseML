@@ -26,19 +26,30 @@ def train_step(model: Module, optimizer: Optimizer, data: Tensor,
 
 
 def training(model: Module, optimizer: Optimizer, cuda: bool, n_epochs: int,
-             batch_size: int, queue: Queue = None):
+             batch_size: int, stop: dict, queue: Queue = None):
+
     train_loader, test_loader = get_data_loaders(batch_size=batch_size)
     if cuda:
         model.cuda()
     for epoch in range(n_epochs):
+        batchCounter = 1
         for batch in train_loader:
             data, target = batch
             train_step(model=model, optimizer=optimizer, cuda=cuda, data=data,
-                       target=target)
-        test_loss, test_acc = accuracy(model, test_loader, cuda)
-        if queue is not None:
-            queue.put(test_acc)
-        print(f"epoch={epoch}, test accuracy={test_acc}, loss={test_loss}")
+                       target=target)     
+            test_loss, test_acc = accuracy(model, test_loader, cuda)
+            if queue is not None:
+                queue.put(test_acc)         # I moved acc updater into batch for loop, to get more results: #batches * #epochs
+            print(f"epoch={epoch}, batch={batchCounter}, test accuracy={test_acc}, loss={test_loss}")   
+
+            batchCounter += 1
+
+            while stop["stop"]:
+                #print("stopped")      # when button "stop training" is pressed then training is stuck here
+                pass                  # until continue button is pressed
+            print("batch done")
+
+
     if cuda:
         empty_cache()
 
