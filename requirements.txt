@@ -1,0 +1,15 @@
+# Backend
+python
+flask
+
+# Data manipulation
+numpy
+pandas
+
+# ML
+pytorch
+torchvision
+
+# Visualization
+matplotlib
+seaborn
