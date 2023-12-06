@@ -98,7 +98,7 @@ function update_accuracy(){
     })
     .then(data => {
       accuracy_span.textContent = data.acc
-      updateChart(data.acc, ac_chart)
+      updateChart(data.acc, accChart)
       updateChart(data.loss, lossChart)
     })
 }
