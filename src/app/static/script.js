@@ -8,7 +8,7 @@ l_chart = document.getElementById("lossChart")
 // deactivate stop and continue button
 stop_btn.disabled = true
 continue_btn.disabled = true
-
+last_batch = 0
 
 
 function start_training(){
@@ -71,6 +71,8 @@ function continue_training(){
   
 }
 
+
+
 function updateChart(dataPoint, chart) {
   
   // Checks if point is "new"
@@ -89,6 +91,7 @@ function updateChart(dataPoint, chart) {
   }
 }
 
+
 function update_accuracy(){
   fetch("/get_accuracy")
     .then(response => {
@@ -97,9 +100,11 @@ function update_accuracy(){
       }
     })
     .then(data => {
-      accuracy_span.textContent = data.acc
+      console.log("Recieved Data:", data)
       updateChart(data.acc, accChart)
       updateChart(data.loss, lossChart)
+      accuracy_span.textContent = data.acc
+      //updateChart(data.loss, lossChart)
     })
 }
 
