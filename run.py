@@ -8,7 +8,7 @@ from src.app.routes.routes import listener
 
 if __name__ == "__main__":
   host = "localhost"
-  port = 5000
+  port = 5001 # iOS runs something on 5000
 
   app = create_app()
   print("App started")

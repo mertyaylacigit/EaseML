@@ -11,16 +11,17 @@ from ...ml.trainers.training import training
 bp = Blueprint("routes", __name__)
 
 seed = 42
-acc = -1
+metrics = {"acc":  -1,
+           "loss": -1}
 q = queue.Queue()
 stop_training_flag = {"stop": False} # Use a dictionary with a mutable flag so when flag flips from False to True the function call training
                                      # receives the change because the function call takes the address of mutable objects rather than a copy 
                                      # of immutable objects like stop = False, so stop = {"stop": False} is better/necessary
 
 def listener():
-    global q, acc
+    global q, metrics
     while True:
-        acc = q.get()
+        metrics = q.get()
         q.task_done()
 
 
@@ -70,5 +71,5 @@ def continue_training():
 
 @bp.route("/get_accuracy")
 def get_accuracy():
-    global acc
-    return jsonify({"acc": acc})
+    global metrics
+    return jsonify(metrics)
