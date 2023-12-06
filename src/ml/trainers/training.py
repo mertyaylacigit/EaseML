@@ -39,7 +39,8 @@ def training(model: Module, optimizer: Optimizer, cuda: bool, n_epochs: int,
                        target=target)     
             test_loss, test_acc = accuracy(model, test_loader, cuda)
             if queue is not None:
-                queue.put(test_acc)         # I moved acc updater into batch for loop, to get more results: #batches * #epochs
+                queue.put({"acc": test_acc,
+                           "loss": test_loss})         # I moved acc updater into batch for loop, to get more results: #batches * #epochs      
             print(f"epoch={epoch}, batch={batchCounter}, test accuracy={test_acc}, loss={test_loss}")   
 
             batchCounter += 1
