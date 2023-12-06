@@ -2,7 +2,8 @@ start_btn = document.getElementById("start_training")
 stop_btn = document.getElementById("stop_training")
 continue_btn = document.getElementById("continue_training")
 accuracy_span = document.getElementById("accuracy")
-chart = document.getElementById("accuracyChart")
+ac_chart = document.getElementById("accuracyChart")
+l_chart = document.getElementById("lossChart")
  
 // deactivate stop and continue button
 stop_btn.disabled = true
@@ -74,16 +75,22 @@ function continue_training(){
   
 }
 
-function updateChart(dataPoint) {
+function updateChart(dataPoint, chart) {
+  
+  // Checks if point is "new"
+  if (dataPoint > 0 && dataPoint !== chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1]) {
   // Add a new data point to the chart
   last_batch = last_batch +1
-  accChart.data.labels.push(last_batch)
-  accChart.data.datasets[0].data.push(dataPoint)
+  chart.data.labels.push(last_batch)
+  chart.data.datasets[0].data.push(dataPoint)
 
 
   
   // Update the chart
-  accChart.update()
+  chart.update()
+  lossChart.update()
+
+  }
 }
 
 function update_accuracy(){
@@ -95,7 +102,7 @@ function update_accuracy(){
     })
     .then(data => {
       console.log("Recieved Data:", data)
-      updateChart(data.acc)
+      updateChart(data.acc, accChart)
       accuracy_span.textContent = data.acc
   })
 
@@ -103,18 +110,41 @@ function update_accuracy(){
 
 
 
-accChart = new Chart(chart, {
+accChart = new Chart(ac_chart, {
   type: 'line',
   data: {
     labels: [],
     datasets: [{
-      label: 'Real-time Data',
+      label: 'Accuracy',
       borderColor: 'rgb(75, 192, 192)',
       data: [],
       fill: false
     }]
   },
   options: {
+    responsive: true,
+    scales: {
+      x: {
+        type: 'linear',
+        position: 'bottom'
+      }
+    }
+  }
+});
+
+lossChart = new Chart(l_chart, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'Loss',
+      borderColor: 'rgb(255, 75, 75)',
+      data: [],
+      fill: false
+    }]
+  },
+  options: {
+    responsive: true,
     scales: {
       x: {
         type: 'linear',

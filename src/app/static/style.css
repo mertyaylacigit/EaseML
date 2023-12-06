@@ -1,0 +1,12 @@
+.chart-container {
+    flex: 0 0 calc(50% - 20px);
+    width: calc(50% - 10px); /* Set width to 50% of the container minus some margin */
+    margin-right: 20px; /* Add margin between chart containers for better spacing */
+    border: 1px solid rgb(0, 255, 234); /* Add a border to the chart containers */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+
+  .monitor-container {
+    display: flex; 
+    width: 800px;
+  }

@@ -15,14 +15,23 @@
     <button id="stop_training">Stop</button>
     <button id="continue_training">Continue</button>
   </div>
-  <div> 
 
-      <canvas id="accuracyChart" width="400" height="200"></canvas> 
-    <div> 
-      <p>Current accuracy: <span id="accuracy">0 test</span></p>
+  <div class="monitor-container">
+
+    <div  class="chart-container">
+      <canvas id="lossChart" width="100px" height="100px"></canvas>
     </div>
 
-    <script src="../static/script.js" defer ></script>
+    <div  class="chart-container">
+      <canvas id="accuracyChart" width="100px" height="100px"></canvas>
+    </div>
+
+</div>
+
+   <div> 
+    <p>Current accuracy: <span id="accuracy">0 test</span></p>
   </div>
+
+  <script src="../static/script.js" defer ></script>
 </body>
 </html>
