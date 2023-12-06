@@ -9,14 +9,9 @@ l_chart = document.getElementById("lossChart")
 stop_btn.disabled = true
 continue_btn.disabled = true
 
-//suppesed to keep track of num of batches
-//currently doesnt do that but rather tracks amout of updates 
-last_batch = 0
-
 
 
 function start_training(){
-  
   fetch("/start_training")
     .then(response => {
       if (!response.ok){
@@ -68,6 +63,7 @@ function continue_training(){
       console.error("Error:", error);
     })
     .finally(()=> {
+      //
     })
 
   continue_btn.disabled = true
@@ -101,11 +97,10 @@ function update_accuracy(){
       }
     })
     .then(data => {
-      console.log("Recieved Data:", data)
-      updateChart(data.acc, accChart)
       accuracy_span.textContent = data.acc
-  })
-
+      updateChart(data.acc, ac_chart)
+      updateChart(data.loss, lossChart)
+    })
 }
 
 
@@ -160,4 +155,4 @@ stop_btn.addEventListener("click", stop_training)
 continue_btn.addEventListener("click", continue_training)
 
 
-setInterval(update_accuracy,2000)
+setInterval(update_accuracy,1000)
