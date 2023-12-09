@@ -1,11 +1,14 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 from torch import manual_seed, Tensor
 from torch.optim import Optimizer, SGD
 import numpy as np
 import queue
+import json
 
 from ...ml.models.model import ConvolutionalNeuralNetwork
 from ...ml.trainers.training import training
+
+from threading import Thread
 
 #blueprint that __init__.py accesses
 bp = Blueprint("routes", __name__)
@@ -32,23 +35,15 @@ def render():
 
 @bp.route("/start_training")
 def start_training():
-  # ensure that these variables are the same as those outside this method
   global q, seed, stop_training_flag
-  # determine pseudo-random number generation
   manual_seed(seed)
   np.random.seed(seed)
-  # initialize training
   model = ConvolutionalNeuralNetwork()
-  opt = SGD(model.parameters(), lr=0.3, momentum=0.5)
-  # execute training
-  training(model=model,
-           optimizer=opt,
-           cuda=False,
-           n_epochs=10,
-           batch_size=256,
-           stop=stop_training_flag,     # added stop flag: dict 
-           queue=q
-           )
+
+  # start training process in seperate thread! 
+  training_thread = Thread(target=training, args=(model, False, 10, stop_training_flag, q))
+  training_thread.start()
+
   return jsonify({"success": True})
 
 
@@ -67,7 +62,31 @@ def continue_training():
 
   return jsonify(stop_training_flag)
 
-
+@bp.route("/update_params", methods=['POST'])
+def update_params():
+    data = request.json # Training parameters should be saved in json format
+    try:
+        config_path = 'config/training_config.json'
+        with open(config_path, 'w') as file:
+            json.dump(data, file)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+    
+@bp.route("/get_current_params")
+def get_current_params():
+    try:
+        config_path = 'config/training_config.json'
+        with open(config_path, 'r') as file:
+            config = json.load(file)
+        # Extract learning rate and batch size
+        current_params = {
+            'lr': config['optimizer_params']['args']['lr'],
+            'batch_size': config['batch_size']
+        }
+        return jsonify(current_params)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 @bp.route("/get_accuracy")
 def get_accuracy():
