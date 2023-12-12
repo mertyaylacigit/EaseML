@@ -8,6 +8,7 @@ l_chart = document.getElementById("lossChart")
 // dynamic parameters
 batch_size_slider = document.getElementById("batch_size_slider")
 learning_rate_slider = document.getElementById("learning_rate_slider")
+momenum_slider = document.getElementById("momentum_slider")
 update_params_btn = document.getElementById("update_params_btn")
 parameter_controls = document.getElementById("parameter_controls")
 
@@ -35,6 +36,7 @@ function start_training(){
       stop_btn.disabled = false;
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
+      momentum_slider.disabled = true;
       update_params_btn.disabled = true;
       updateCurrentParameters();
     })
@@ -56,6 +58,7 @@ function stop_training(){
       continue_btn.disabled = false;
       batch_size_slider.disabled = false;
       learning_rate_slider.disabled = false;
+      momentum_slider.disabled = false;
       update_params_btn.disabled = false;
     })
 }
@@ -76,6 +79,7 @@ function continue_training(){
       stop_btn.disabled = false;
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
+      momentum_slider.disabled = true;
       update_params_btn.disabled = true;
       updateCurrentParameters();
     })  
@@ -143,6 +147,7 @@ function updateCurrentParameters() {
           } else {
               document.getElementById("current_batch_size").textContent = data.batch_size || "N/A";
               document.getElementById("current_learning_rate").textContent = data.lr || "N/A";
+              document.getElementById("current_momentum").textContent = data.momentum || "N/A";
           }
       })
       .catch(error => {
@@ -212,15 +217,18 @@ learning_rate_slider.oninput = function() {
   document.getElementById("learning_rate_value").textContent = this.value;
 }
 
+momentum_slider.oninput = function() {
+  document.getElementById("momentum_value").textContent = this.value;
+}
+
 update_params_btn.addEventListener("click", function() {
   let newParams = {
       "optimizer_params": {
           "type": "SGD", // Assuming 'SGD' is your desired optimizer
           "args": {
               "lr": parseFloat(learning_rate_slider.value),
-              "momentum": 0.5
+              "momentum": parseFloat(momentum_slider.value)
               // Add any other arguments your optimizer requires
-              // "momentum": <value>
           }
       },
       "batch_size": parseInt(batch_size_slider.value)

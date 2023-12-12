@@ -1,12 +1,118 @@
-.chart-container {
-    flex: 0 0 calc(50% - 20px);
-    width: calc(50% - 10px); /* Set width to 50% of the container minus some margin */
-    margin-right: 20px; /* Add margin between chart containers for better spacing */
-    border: 1px solid rgb(0, 255, 234); /* Add a border to the chart containers */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-  }
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 
-  .monitor-container {
-    display: flex; 
-    width: 800px;
-  }
+body {
+  background-color: #f4f4f4;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.navbar {
+  background-color: white;
+  color: #007bff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar span {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.hamburger-menu {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.main-content {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+  background-color: white;
+  margin: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.parameter-options, .control-buttons, .additional-buttons {
+  flex-basis: 30%;
+  padding: 10px;
+}
+
+.control-buttons button, .additional-buttons button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.control-buttons button:hover, .additional-buttons button:hover {
+  background-color: #0056b3;
+}
+
+.parameter-options label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.parameter-options input[type=range] {
+  width: 100%;
+}
+
+.parameter-options span {
+  display: block;
+  text-align: center;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.training-monitor {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  margin: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.chart-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container {
+  padding: 10px;
+  margin: 10px;
+}
+
+.chart-container canvas {
+  width: 500px; 
+  height: 500px;
+}
+
+.current-parameters-section {
+  max-width: 300px;
+  margin-left: 20px;
+}
+
+.current-parameters-section p {
+  margin-bottom: 10px;
+}
+
