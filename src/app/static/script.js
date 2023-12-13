@@ -32,6 +32,12 @@ function start_training(){
     })
     .finally(()=> {
       // Hide parameter controls when training starts
+      document.querySelectorAll('.neural-network .node').forEach(node => {
+        node.classList.remove('orange-outline');
+      });
+      const neuralNetworkAnimation = document.getElementById('neuralNetworkAnimation');
+      neuralNetworkAnimation.style.display = 'flex';
+      neuralNetworkAnimation.classList.add('is-training');
       start_btn.disabled = true;
       stop_btn.disabled = false;
       batch_size_slider.disabled = true;
@@ -54,6 +60,11 @@ function stop_training(){
       console.error("Error:", error);
     })
     .finally(()=> {
+      document.querySelectorAll('.neural-network .node').forEach(node => {
+        node.classList.add('orange-outline');
+      });
+      const neuralNetworkAnimation = document.getElementById('neuralNetworkAnimation');
+      neuralNetworkAnimation.classList.remove('is-training');
       stop_btn.disabled = true;
       continue_btn.disabled = false;
       batch_size_slider.disabled = false;
@@ -75,6 +86,12 @@ function continue_training(){
       console.error("Error:", error);
     })
     .finally(()=> {
+      document.querySelectorAll('.neural-network .node').forEach(node => {
+        node.classList.remove('orange-outline');
+      });
+      const neuralNetworkAnimation = document.getElementById('neuralNetworkAnimation');
+      neuralNetworkAnimation.style.display = 'flex';
+      neuralNetworkAnimation.classList.add('is-training');
       continue_btn.disabled = true;
       stop_btn.disabled = false;
       batch_size_slider.disabled = true;

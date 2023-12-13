@@ -21,6 +21,7 @@
     <div class="main-content">
         <!-- Parameter Options -->
         <div class="parameter-options">
+            <h3>Model Configuration</h3>
             <div>
                 <label for="batch_size_slider">Batch Size:</label>
                 <input type="range" id="batch_size_slider" name="batch_size" min="1" max="512" value="256">
@@ -39,16 +40,73 @@
             <button id="update_params_btn">Update Parameters</button>
         </div>
 
-        <!-- Control Buttons -->
-        <div class="control-buttons">
-            <button id="start_training">Start training</button>
-            <button id="stop_training">Stop</button>
-            <button id="continue_training">Continue</button>
+        <div class="control-and-animation">
+            <h3>Training Control</h3>
+            <!-- Control Buttons -->
+            <div class="control-buttons">
+                <button id="start_training">Start Training</button>
+                <button id="stop_training">Stop</button>
+                <button id="continue_training">Continue</button>
+            </div>
+
+            <!-- Neural Network Animation -->
+            <div id="neuralNetworkAnimation" class="neural-network" style="display: none;">
+                <!-- Layer 1 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+                <!-- Repeat for additional layers (2-5) with different numbers of nodes -->
+                <!-- Layer 2 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+                <!-- Layer 3 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+                <!-- Layer 4 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+                <!-- ... additional layers ... -->
+                <!-- Layer 5 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+            </div>
         </div>
 
         <!-- Configuration area / Additional area -->
         <div class="additional-buttons">
+            <h3>Configuration History</h3>
+            <!-- Configuration List Box -->
+            <div id="configurationList" class="config-list">
+                <p>No configurations saved yet.</p>
+            </div>
             <button id="save_config">Save Configuration</button>
+            <button id="load_config">Load Configuration</button>
             <button id="clear_config">Clear Configuration</button>
         </div>
     </div>
@@ -56,6 +114,7 @@
     <!-- Training Monitor / Analysis -->
     <div class="training-monitor">
         <div class="monitor-container">
+        <h3>Training Monitor</h3>
           <!-- Charts -->
           <div class="chart-section">
             <div class="chart-container">
@@ -79,6 +138,14 @@
 
     <script>
         window.onload = function() {
+            const neuralNetworkAnimation = document.getElementById('neuralNetworkAnimation');
+            const save_config_btn = document.getElementById('save_config');
+            const load_config_btn = document.getElementById('load_config');
+            const clear_config_btn = document.getElementById('clear_config');
+            neuralNetworkAnimation.style.display = 'flex';
+            save_config_btn.disabled = true;
+            load_config_btn.disabled = true;
+            clear_config_btn.disabled = true;
             let newParams = {
                 "optimizer_params": {
                     "type": "SGD", // Assuming 'SGD' is your desired optimizer
