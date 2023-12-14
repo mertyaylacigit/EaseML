@@ -82,6 +82,7 @@ def get_current_params():
         # Extract learning rate and batch size
         current_params = {
             'lr': config['optimizer_params']['args']['lr'],
+            'momentum': config['optimizer_params']['args']['momentum'],
             'batch_size': config['batch_size']
         }
         return jsonify(current_params)

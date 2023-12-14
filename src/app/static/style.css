@@ -1,12 +1,255 @@
-.chart-container {
-    flex: 0 0 calc(50% - 20px);
-    width: calc(50% - 10px); /* Set width to 50% of the container minus some margin */
-    margin-right: 20px; /* Add margin between chart containers for better spacing */
-    border: 1px solid rgb(0, 255, 234); /* Add a border to the chart containers */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-  }
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 
-  .monitor-container {
-    display: flex; 
-    width: 800px;
-  }
+body {
+  background-color: #f4f4f4;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.navbar {
+  background-color: white;
+  color: #007bff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar span {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.hamburger-menu {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.main-content {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+  background-color: white;
+  margin: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.parameter-options, .control-buttons, .additional-buttons {
+  flex-basis: 30%;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.parameter-options h3, .control-and-animation h3, .additional-buttons h3 {
+  margin-bottom: 10px; /* Adjust this value as needed for alignment */
+  text-align: left;
+}
+
+.control-buttons {
+  display: flex;
+  flex-direction: row; /* Align buttons in a row */
+  justify-content: center; /* Horizontally center the buttons */
+  align-items:; /* Vertically center (if needed) */
+  gap: 10px; /* Space between buttons */
+  flex-basis: 30%;
+  padding: 10px;
+}
+
+.control-and-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Styles for disabled buttons */
+.control-buttons button:disabled, 
+.additional-buttons button:disabled,
+.parameter-options button:disabled {
+    background-color: #cccccc;
+    color: whitesmoke;
+    cursor: not-allowed;
+}
+
+.control-buttons button, .additional-buttons button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.additional-buttons {
+  padding-bottom: 20px; /* Adds extra padding at the bottom */
+}
+
+.control-buttons button:not(:disabled):hover, 
+.additional-buttons button:not(:disabled):hover,
+.parameter-options button:not(:disabled):hover {
+  background-color: #0056b3;
+}
+
+.parameter-options button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px; /* Add some space above the button */
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.parameter-options label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.parameter-options input[type=range] {
+  width: 100%;
+}
+
+.parameter-options span {
+  display: block;
+  text-align: center;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.training-monitor {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  margin: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.chart-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container {
+  padding: 10px;
+  margin: 10px;
+}
+
+.chart-container canvas {
+  width: 500px; 
+  height: 500px;
+}
+
+.current-parameters-section {
+  max-width: 300px;
+  margin-left: 20px;
+}
+
+.current-parameters-section p {
+  margin-bottom: 10px;
+}
+
+.neural-network {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.node-row {
+  display: flex;
+  justify-content: center;
+}
+
+.node {
+  border: 2px solid #007bff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  margin: 5px;
+  background-color: transparent; /* Nodes are transparent when not training */
+}
+
+/* Class for orange outline */
+.node.orange-outline {
+  border-color: lightgray;
+}
+
+/* Animation only when training */
+.is-training .node {
+  animation: glow 1.5s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { background-color: #007bff; }
+  50% { background-color: transparent; }
+}
+
+/* Apply animation delays for each node */
+/* Adjust the delays as needed based on the number of nodes and desired effect */
+.neural-network .node-row:nth-child(1) .node:nth-child(1) { animation-delay: 0s; }
+.neural-network .node-row:nth-child(1) .node:nth-child(2) { animation-delay: 0.1s; }
+/* Continue for all nodes in the first row */
+
+.neural-network .node-row:nth-child(2) .node:nth-child(1) { animation-delay: 0.5s; }
+.neural-network .node-row:nth-child(2) .node:nth-child(2) { animation-delay: 0.6s; }
+.neural-network .node-row:nth-child(2) .node:nth-child(3) { animation-delay: 0.55s; }
+.neural-network .node-row:nth-child(2) .node:nth-child(4) { animation-delay: 0.4s; }
+.neural-network .node-row:nth-child(2) .node:nth-child(5) { animation-delay: 0.6s; }
+/* Continue for all nodes in the second row */
+
+.neural-network .node-row:nth-child(3) .node:nth-child(1) { animation-delay: 1.1s; }
+.neural-network .node-row:nth-child(3) .node:nth-child(2) { animation-delay: 1s; }
+.neural-network .node-row:nth-child(3) .node:nth-child(3) { animation-delay: 1.2s; }
+.neural-network .node-row:nth-child(3) .node:nth-child(4) { animation-delay: 0.9s; }
+.neural-network .node-row:nth-child(3) .node:nth-child(5) { animation-delay: 1.1s; }
+.neural-network .node-row:nth-child(3) .node:nth-child(6) { animation-delay: 1.0s; }
+.neural-network .node-row:nth-child(3) .node:nth-child(7) { animation-delay: 1.1s; }
+.neural-network .node-row:nth-child(3) .node:nth-child(8) { animation-delay: 1.2s; }
+
+.neural-network .node-row:nth-child(4) .node:nth-child(1) { animation-delay: 1.5s; }
+.neural-network .node-row:nth-child(4) .node:nth-child(2) { animation-delay: 1.6s; }
+.neural-network .node-row:nth-child(4) .node:nth-child(3) { animation-delay: 1.5s; }
+.neural-network .node-row:nth-child(4) .node:nth-child(4) { animation-delay: 1.4s; }
+.neural-network .node-row:nth-child(4) .node:nth-child(5) { animation-delay: 1.7s; }
+/* Repeat for subsequent rows, increasing the base delay for each row */
+
+.neural-network .node-row:nth-child(5) .node:nth-child(1) { animation-delay: 2s; }
+.neural-network .node-row:nth-child(5) .node:nth-child(2) { animation-delay: 2.1s; }
+/* And so on for each node in the third row */
+
+/* Continue the pattern for all rows and nodes */
+
+/* Configuration area */
+.config-list {
+  border: 1px solid #ddd;
+  background-color: #f8f8f8;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  min-height: 160px; /* Adjust the height as needed */
+  overflow-y: auto; /* Allows scrolling if content overflows */
+}
+
+.config-list p {
+  color: #666;
+  text-align: center;
+}

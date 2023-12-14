@@ -1,78 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="../static/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="../static/script.js" defer ></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EaseML</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../static/script.js" defer ></script>
 </head>
 <body>
-  <h1>EaseML</h1>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <span>EaseML</span>
+        <div class="hamburger-menu">
+            <span>&#9776;</span> <!-- Represents the hamburger icon -->
+        </div>
+    </nav>
 
-  <div id="parameter_controls">
-    <div>
-      <label for="batch_size_slider">Batch Size:</label>
-      <input type="range" id="batch_size_slider" name="batch_size" min="1" max="512" value="256">
-      <span id="batch_size_value">256</span>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Parameter Options -->
+        <div class="parameter-options">
+            <h3>Model Configuration</h3>
+            <div>
+                <label for="batch_size_slider">Batch Size:</label>
+                <input type="range" id="batch_size_slider" name="batch_size" min="1" max="512" value="256">
+                <span id="batch_size_value">256</span>
+            </div>
+            <div>
+                <label for="learning_rate_slider">Learning Rate:</label>
+                <input type="range" id="learning_rate_slider" name="learning_rate" min="0.01" max="1" step="0.01" value="0.3">
+                <span id="learning_rate_value">0.3</span>
+            </div>
+            <div>
+                <label for="momentum_slider">Momentum:</label>
+                <input type="range" id="momentum_slider" name="momentum" min="0" max="1" step="0.01" value="0.5">
+                <span id="momentum_value">0.5</span>
+            </div>
+            <button id="update_params_btn">Update Parameters</button>
+        </div>
+
+        <div class="control-and-animation">
+            <h3>Training Control</h3>
+            <!-- Control Buttons -->
+            <div class="control-buttons">
+                <button id="start_training">Start Training</button>
+                <button id="stop_training">Stop</button>
+                <button id="continue_training">Continue</button>
+            </div>
+
+            <!-- Neural Network Animation -->
+            <div id="neuralNetworkAnimation" class="neural-network" style="display: none;">
+                <!-- Layer 1 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+                <!-- Repeat for additional layers (2-5) with different numbers of nodes -->
+                <!-- Layer 2 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+                <!-- Layer 3 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+                <!-- Layer 4 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+                <!-- ... additional layers ... -->
+                <!-- Layer 5 -->
+                <div class="node-row">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <!-- Add more nodes as needed -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration area / Additional area -->
+        <div class="additional-buttons">
+            <h3>Configuration History</h3>
+            <!-- Configuration List Box -->
+            <div id="configurationList" class="config-list">
+                <p>No configurations saved yet.</p>
+            </div>
+            <button id="save_config">Save Configuration</button>
+            <button id="load_config">Load Configuration</button>
+            <button id="clear_config">Clear Configuration</button>
+        </div>
     </div>
-    <div>
-      <label for="learning_rate_slider">Learning Rate:</label>
-      <input type="range" id="learning_rate_slider" name="learning_rate" min="0.01" max="1" step="0.01" value="0.3">
-      <span id="learning_rate_value">0.3</span>
+
+    <!-- Training Monitor / Analysis -->
+    <div class="training-monitor">
+        <div class="monitor-container">
+        <h3>Training Monitor</h3>
+          <!-- Charts -->
+          <div class="chart-section">
+            <div class="chart-container">
+              <canvas id="lossChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="accuracyChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <!-- Current Parameters -->
+        <div class="current-parameters-section">
+          <p>Current accuracy: <span id="accuracy">N/A</span></p>
+          <div id="current_parameters">
+              <p>Current Batch Size: <span id="current_batch_size">N/A</span></p>
+              <p>Current Learning Rate: <span id="current_learning_rate">N/A</span></p>
+              <p>Current Momentum: <span id="current_momentum">N/A</span></p>
+          </div>
+        </div>
     </div>
-    <button id="update_params_btn">Update Parameter Changes</button>
-  </div>
-  
 
-  <div>
-    <button id="start_training">Start training</button>
-    <button id="stop_training">Stop</button>
-    <button id="continue_training">Continue</button>
-  </div>
-
-  <div class="monitor-container">
-
-    <div  class="chart-container">
-      <canvas id="lossChart" width="100px" height="100px"></canvas>
-    </div>
-
-    <div  class="chart-container">
-      <canvas id="accuracyChart" width="100px" height="100px"></canvas>
-    </div>
-
-</div>
-
-
-  
-  <div> 
-    <p>Current accuracy: <span id="accuracy">0 test</span></p>
-    <div id="current_parameters">
-      <p>Current Batch Size: <span id="current_batch_size">N/A</span></p>
-      <p>Current Learning Rate: <span id="current_learning_rate">N/A</span></p>
-    </div>
-  
-  </div>
-
-  <script src="../static/script.js" defer ></script>
-  <script>
-    window.onload = function() {
-        let newParams = {
-        "optimizer_params": {
-            "type": "SGD", // Assuming 'SGD' is your desired optimizer
-            "args": {
-                "lr": parseFloat(learning_rate_slider.value),
-                "momentum": 0.5
-                // Add any other arguments your optimizer requires
-                // "momentum": <value>
-            }
-        },
-        "batch_size": parseInt(batch_size_slider.value)
+    <script>
+        window.onload = function() {
+            const neuralNetworkAnimation = document.getElementById('neuralNetworkAnimation');
+            const save_config_btn = document.getElementById('save_config');
+            const load_config_btn = document.getElementById('load_config');
+            const clear_config_btn = document.getElementById('clear_config');
+            neuralNetworkAnimation.style.display = 'flex';
+            save_config_btn.disabled = true;
+            load_config_btn.disabled = true;
+            clear_config_btn.disabled = true;
+            let newParams = {
+                "optimizer_params": {
+                    "type": "SGD", // Assuming 'SGD' is your desired optimizer
+                    "args": {
+                        "lr": parseFloat(document.getElementById("learning_rate_slider").value),
+                        "momentum": parseFloat(document.getElementById("momentum_slider").value)
+                    }
+                },
+                "batch_size": parseInt(document.getElementById("batch_size_slider").value)
+            };
+            updateTrainingParams(newParams); // Initialize parameter config
         };
-        updateTrainingParams(newParams); // Initialize parameter config
-    };
-  </script>
-
+    </script>
 </body>
 </html>
