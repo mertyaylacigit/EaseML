@@ -93,3 +93,56 @@ def get_current_params():
 def get_accuracy():
     global metrics
     return jsonify(metrics)
+
+@bp.route("/saveConfiguration")
+def saveConfiguration():
+    # get current configurations
+    config_path = 'config/training_config.json'
+    with open(config_path, 'r') as file:
+        current_config = json.load(file)
+
+
+    config_history_path = 'config/config_history.json'
+    try:
+        with open(config_history_path, 'r') as file:
+            config_history = json.load(file)
+
+    except FileNotFoundError:
+        # If the file doesn't exist yet, create an empty dictionary
+        config_history = {}
+
+    next_index = len(config_history)
+    config_history[next_index] = current_config  # add current config to config history
+
+    with open(config_history_path, 'w') as file:
+        json.dump(config_history, file)
+
+    return jsonify({"config_id":next_index,
+                    "config_body": current_config
+                    })
+
+
+@bp.route("/removeConfiguration")
+def removeConfiguration():
+    print(request.args.get("config_id"))
+    return jsonify({"success":True})
+
+
+@bp.route("/loadConfiguration")
+def loadConfiguration():
+    config_id = request.args.get("config_id")
+
+    config_history_path = 'config/config_history.json'
+    with open(config_history_path, 'r') as file:
+        config_history = json.load(file)
+
+    return jsonify(config_history[config_id])
+    
+    
+@bp.route("/clearConfigurationHistory")
+def clearConfigurationHistory():
+    config_history_path = 'config/config_history.json'
+    with open(config_history_path, 'w') as file:
+        json.dump({},file)
+    
+    return jsonify({"success": True})

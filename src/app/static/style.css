@@ -253,3 +253,7 @@ body {
   color: #666;
   text-align: center;
 }
+
+.increasedDensity {
+  background-color: #003b79 !important;
+}

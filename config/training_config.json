@@ -1,1 +1,1 @@
-{"optimizer_params": {"type": "SGD", "args": {"lr": 0.3, "momentum": 0.5}}, "batch_size": 256}
+{"batch_size": 256, "optimizer_params": {"args": {"lr": 0.7, "momentum": 0.5}, "type": "SGD"}}

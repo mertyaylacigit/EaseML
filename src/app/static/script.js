@@ -1,22 +1,24 @@
-start_btn = document.getElementById("start_training")
-stop_btn = document.getElementById("stop_training")
-continue_btn = document.getElementById("continue_training")
-accuracy_span = document.getElementById("accuracy")
-ac_chart = document.getElementById("accuracyChart")
-l_chart = document.getElementById("lossChart")
+const start_btn = document.getElementById("start_training")
+const stop_btn = document.getElementById("stop_training")
+const continue_btn = document.getElementById("continue_training")
+const accuracy_span = document.getElementById("accuracy")
+const ac_chart = document.getElementById("accuracyChart")
+const l_chart = document.getElementById("lossChart")
 
 // dynamic parameters
-batch_size_slider = document.getElementById("batch_size_slider")
-learning_rate_slider = document.getElementById("learning_rate_slider")
-momenum_slider = document.getElementById("momentum_slider")
-update_params_btn = document.getElementById("update_params_btn")
-parameter_controls = document.getElementById("parameter_controls")
+const batch_size_slider = document.getElementById("batch_size_slider")
+const learning_rate_slider = document.getElementById("learning_rate_slider")
+const momenum_slider = document.getElementById("momentum_slider")
+const update_params_btn = document.getElementById("update_params_btn")
+const parameter_controls = document.getElementById("parameter_controls")
 
- 
+
 // deactivate stop and continue button
 stop_btn.disabled = true
 continue_btn.disabled = true
-last_batch = 0
+
+var last_batch = 0
+
 
 
 function start_training(){
@@ -27,7 +29,6 @@ function start_training(){
       }
     })
     .catch(error => {
-      // Handle network or fetch-related errors
       console.error("Error:", error);
     })
     .finally(()=> {
@@ -56,7 +57,6 @@ function stop_training(){
       }
     })
     .catch(error => {
-      // Handle network or fetch-related errors
       console.error("Error:", error);
     })
     .finally(()=> {
@@ -82,7 +82,6 @@ function continue_training(){
       }
     })
     .catch(error => {
-      // Handle network or fetch-related errors
       console.error("Error:", error);
     })
     .finally(()=> {
@@ -175,6 +174,7 @@ function updateCurrentParameters() {
 
 
 
+
 accChart = new Chart(ac_chart, {
   type: 'line',
   data: {
@@ -220,6 +220,10 @@ lossChart = new Chart(l_chart, {
 });
 
 
+
+//------EventListener---------------------------------------------
+
+
 start_btn.addEventListener("click", start_training)
 stop_btn.addEventListener("click", stop_training)
 continue_btn.addEventListener("click", continue_training)
@@ -255,3 +259,7 @@ update_params_btn.addEventListener("click", function() {
 
 
 setInterval(update_accuracy,1000)
+
+
+
+

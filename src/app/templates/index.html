@@ -7,9 +7,10 @@
     <link rel="stylesheet" href="../static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../static/script.js" defer ></script>
+    <script src="../static/history_script.js" defer ></script>
 </head>
 <body>
-    <!-- Navigation Bar -->
+    <!-- Navigation Bar
     <nav class="navbar">
         <span>EaseML</span>
         <div class="hamburger-menu">
@@ -105,9 +106,12 @@
             <div id="configurationList" class="config-list">
                 <p>No configurations saved yet.</p>
             </div>
+
             <button id="save_config">Save Configuration</button>
-            <button id="load_config">Load Configuration</button>
-            <button id="clear_config">Clear Configuration</button>
+            <button id="remove_config">Remove Config</button>
+            <button id="load_config">Load Config</button>
+            <br>
+            <button id="clear_config_history">Clear Configuration History</button>
         </div>
     </div>
 
@@ -139,13 +143,9 @@
     <script>
         window.onload = function() {
             const neuralNetworkAnimation = document.getElementById('neuralNetworkAnimation');
-            const save_config_btn = document.getElementById('save_config');
-            const load_config_btn = document.getElementById('load_config');
-            const clear_config_btn = document.getElementById('clear_config');
+
             neuralNetworkAnimation.style.display = 'flex';
-            save_config_btn.disabled = true;
-            load_config_btn.disabled = true;
-            clear_config_btn.disabled = true;
+
             let newParams = {
                 "optimizer_params": {
                     "type": "SGD", // Assuming 'SGD' is your desired optimizer
