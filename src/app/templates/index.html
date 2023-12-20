@@ -17,22 +17,27 @@
         </div>
     </nav>
 
+    <!-- Oracle Area -->
+    <div id="oracleArea" class="oracle-area">
+        <span>🔮</span> <!-- Magic ball emoji as default content -->
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
         <!-- Parameter Options -->
         <div class="parameter-options">
             <h3>Model Configuration</h3>
-            <div>
+            <div class="slider-container tooltip" data-tooltip="Batch Size refers to the number of training examples used in one iteration of model training. A smaller batch size means the model updates its weights more frequently, which can lead to faster learning but may be more computationally intensive and less stable. Conversely, a larger batch size provides a more stable learning process but may be slower and require more memory.">
                 <label for="batch_size_slider">Batch Size:</label>
                 <input type="range" id="batch_size_slider" name="batch_size" min="1" max="512" value="256">
                 <span id="batch_size_value">256</span>
             </div>
-            <div>
-                <label for="learning_rate_slider">Learning Rate:</label>
+            <div class="slider-container tooltip" data-tooltip="Learning Rate is a crucial hyperparameter that determines the size of the steps taken during the optimization process. A high learning rate can cause the model to converge quickly but might overshoot the optimal solution. A low learning rate ensures more precise convergence but at the cost of training speed.">
+                <label for="learning_rate_slider tooltip">Learning Rate:</label>
                 <input type="range" id="learning_rate_slider" name="learning_rate" min="0.01" max="1" step="0.01" value="0.3">
                 <span id="learning_rate_value">0.3</span>
             </div>
-            <div>
+            <div class="slider-container tooltip" data-tooltip="Used in conjunction with the learning rate, momentum helps to accelerate the learning process by moving more quickly through flat areas of the loss landscape and dampening oscillations. It adds a fraction of the previous update to the current update, enabling the model to build up speed in directions with consistent gradient.">
                 <label for="momentum_slider">Momentum:</label>
                 <input type="range" id="momentum_slider" name="momentum" min="0" max="1" step="0.01" value="0.5">
                 <span id="momentum_value">0.5</span>
@@ -117,10 +122,10 @@
         <h3>Training Monitor</h3>
           <!-- Charts -->
           <div class="chart-section">
-            <div class="chart-container">
+            <div class="chart-container tooltip" data-tooltip="Loss is a measure of how far a model's predictions are from the actual values. In essence, it quantifies the error of the model. The goal of training is to minimize this loss, which, in turn, improves the model's accuracy.">
               <canvas id="lossChart"></canvas>
             </div>
-            <div class="chart-container">
+            <div class="chart-container tooltip" data-tooltip="Accuracy is a measure of a model's performance, typically used for classification tasks. It represents the proportion of correct predictions among the total number of cases processed. High accuracy indicates that the model is able to correctly label the data most of the time.">
               <canvas id="accuracyChart"></canvas>
             </div>
           </div>

@@ -255,3 +255,26 @@ update_params_btn.addEventListener("click", function() {
 
 
 setInterval(update_accuracy,1000)
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const oracleArea = document.getElementById('oracleArea');
+
+  // Function to update the oracle area content
+  function updateOracleContent(content) {
+      oracleArea.innerHTML = content;
+  }
+
+  // Add hover listeners to elements with tooltips
+  document.querySelectorAll('.tooltip').forEach(item => {
+      item.addEventListener('mouseover', () => {
+          const tooltipText = item.getAttribute('data-tooltip');
+          updateOracleContent(tooltipText || '🔮');
+      });
+
+      item.addEventListener('mouseout', () => {
+          updateOracleContent('🔮'); // Reset to default content
+      });
+  });
+});
