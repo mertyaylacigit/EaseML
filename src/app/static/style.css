@@ -245,11 +245,15 @@ body {
   padding: 10px;
   margin-top: 10px;
   margin-bottom: 20px;
-  min-height: 160px; /* Adjust the height as needed */
+  height: 250px; 
   overflow-y: auto; /* Allows scrolling if content overflows */
 }
 
 .config-list p {
   color: #666;
   text-align: center;
+}
+
+.increasedDensity {
+  background-color: #003b79 !important;
 }

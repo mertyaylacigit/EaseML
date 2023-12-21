@@ -1,3 +1,8 @@
+# Ignore config files
+config/config_history.json
+config/training_config.json
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

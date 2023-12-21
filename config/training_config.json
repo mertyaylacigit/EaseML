@@ -1,1 +1,0 @@
-{"optimizer_params": {"type": "SGD", "args": {"lr": 0.3, "momentum": 0.5}}, "batch_size": 256}
