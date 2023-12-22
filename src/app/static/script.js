@@ -171,7 +171,16 @@ function updateCurrentParameters() {
       });
 }
 
-
+function toggleInfo(panelId, btn) {
+  var panel = document.getElementById(panelId);
+  if (panel.style.display === "block") {
+    panel.style.display = "none";
+    btn.innerHTML = "▼"; // Change to downward arrow when panel is hidden
+  } else {
+    panel.style.display = "block";
+    btn.innerHTML = "▲"; // Change to upward arrow when panel is shown
+  }
+}
 
 
 
