@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EaseML</title>
+    <title>easeML</title>
     <link rel="stylesheet" href="../static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../static/script.js" defer ></script>
     <script src="../static/history_script.js" defer ></script>
 </head>
 <body>
-    <!-- Navigation Bar
+    <!-- Navigation Bar -->
     <nav class="navbar">
-        <span>EaseML</span>
+        <span>easeML</span>
         <div class="hamburger-menu">
             <span>&#9776;</span> <!-- Represents the hamburger icon -->
         </div>
@@ -23,78 +23,104 @@
         <!-- Parameter Options -->
         <div class="parameter-options">
             <h3>Model Configuration</h3>
-            <div>
-                <label for="batch_size_slider">Batch Size:</label>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="batch_size_slider">Batch Size:</label>
+                    <!-- Fold-out button with initial arrow symbol -->
+                    <button class="info-button" onclick="toggleInfo('batch_size_info', this)">▼</button>
+                </div>
+                <!-- Hidden information panel -->
+                <div id="batch_size_info" class="info-panel">
+                    <p>Batch size determines the number of samples processed before the model is updated.</p>
+                </div>
                 <input type="range" id="batch_size_slider" name="batch_size" min="1" max="512" value="256">
                 <span id="batch_size_value">256</span>
             </div>
-            <div>
-                <label for="learning_rate_slider">Learning Rate:</label>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="learning_rate_slider">Learning Rate:</label>
+                    <!-- Fold-out button with initial arrow symbol -->
+                    <button class="info-button" onclick="toggleInfo('learning_rate', this)">▼</button>
+                </div>
+                <!-- Hidden information panel -->
+                <div id="learning_rate" class="info-panel">
+                    <p>The speed at which a model learns; a higher rate can hasten learning but risk overshooting optimal solutions.</p>
+                </div>
                 <input type="range" id="learning_rate_slider" name="learning_rate" min="0.01" max="1" step="0.01" value="0.3">
                 <span id="learning_rate_value">0.3</span>
             </div>
-            <div>
-                <label for="momentum_slider">Momentum:</label>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="momentum_slider">Momentum:</label>
+                    <!-- Fold-out button with initial arrow symbol -->
+                    <button class="info-button" onclick="toggleInfo('momentum_slider_info', this)">▼</button>
+                </div>
+                <!-- Hidden information panel -->
+                <div id="momentum_slider_info" class="info-panel">
+                    <p>A technique to accelerate the model's learning, particularly helpful in navigating ravines and avoiding local minima.</p>
+                </div>
                 <input type="range" id="momentum_slider" name="momentum" min="0" max="1" step="0.01" value="0.5">
                 <span id="momentum_value">0.5</span>
             </div>
             <button id="update_params_btn">Update Parameters</button>
         </div>
 
-        <div class="control-and-animation">
-            <h3>Training Control</h3>
-            <!-- Control Buttons -->
-            <div class="control-buttons">
-                <button id="start_training">Start Training</button>
-                <button id="stop_training">Stop</button>
-                <button id="continue_training">Continue</button>
-            </div>
+        <div id="training-control">
+            <div class="control-and-animation">
+                <h3>Training Control</h3>
+                <!-- Control Buttons -->
+                <div class="control-buttons">
+                    <button id="start_training">Start Training</button>
+                    <button id="stop_training">Stop</button>
+                    <button id="continue_training">Continue</button>
+                </div>
 
-            <!-- Neural Network Animation -->
-            <div id="neuralNetworkAnimation" class="neural-network" style="display: none;">
-                <!-- Layer 1 -->
-                <div class="node-row">
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <!-- Add more nodes as needed -->
-                </div>
-                <!-- Repeat for additional layers (2-5) with different numbers of nodes -->
-                <!-- Layer 2 -->
-                <div class="node-row">
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <!-- Add more nodes as needed -->
-                </div>
-                <!-- Layer 3 -->
-                <div class="node-row">
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <!-- Add more nodes as needed -->
-                </div>
-                <!-- Layer 4 -->
-                <div class="node-row">
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <!-- Add more nodes as needed -->
-                </div>
-                <!-- ... additional layers ... -->
-                <!-- Layer 5 -->
-                <div class="node-row">
-                    <div class="node"></div>
-                    <div class="node"></div>
-                    <!-- Add more nodes as needed -->
+                <!-- Neural Network Animation -->
+                <div id="neuralNetworkAnimation" class="neural-network" style="display: none;">
+                    <!-- Layer 1 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                    <!-- Repeat for additional layers (2-5) with different numbers of nodes -->
+                    <!-- Layer 2 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                    <!-- Layer 3 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                    <!-- Layer 4 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                    <!-- ... additional layers ... -->
+                    <!-- Layer 5 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,23 +146,44 @@
         <div class="monitor-container">
         <h3>Training Monitor</h3>
           <!-- Charts -->
-          <div class="chart-section">
+          <div class="chart-section-container">
+            <!-- Loss Chart -->
             <div class="chart-container">
-              <canvas id="lossChart"></canvas>
+                <div class="chart-header">
+                    <label>Loss:</label>
+                    <button class="info-button" onclick="toggleInfo('loss_info', this)">▼</button>
+                </div>
+                <div id="loss_info" class="info-panel">
+                    <p>Measurement of how far the model's predictions deviate from the actual values, guiding optimization.</p>
+                </div>
+                <div class="chart-content">
+                    <canvas id="lossChart"></canvas>
+                </div>
             </div>
+        
+            <!-- Accuracy Chart -->
             <div class="chart-container">
-              <canvas id="accuracyChart"></canvas>
+                <div class="chart-header">
+                    <label>Accuracy:</label>
+                    <button class="info-button" onclick="toggleInfo('accuracy_info', this)">▼</button>
+                </div>
+                <div id="accuracy_info" class="info-panel">
+                    <p>Proportion of correct predictions made by the model, indicating its overall effectiveness.</p>
+                </div>
+                <div class="chart-content">
+                    <canvas id="accuracyChart"></canvas>
+                </div>
             </div>
-          </div>
         </div>
-        <!-- Current Parameters -->
+        </div>
+        <!-- Current Parameters Section -->
         <div class="current-parameters-section">
-          <p>Current accuracy: <span id="accuracy">N/A</span></p>
-          <div id="current_parameters">
-              <p>Current Batch Size: <span id="current_batch_size">N/A</span></p>
-              <p>Current Learning Rate: <span id="current_learning_rate">N/A</span></p>
-              <p>Current Momentum: <span id="current_momentum">N/A</span></p>
-          </div>
+            <h3>Current Parameters</h3>
+            <p> </p>
+            <p>Accuracy: <span id="accuracy">N/A</span></p>
+            <p>Batch Size: <span id="current_batch_size">N/A</span></p>
+            <p>Learning Rate: <span id="current_learning_rate">N/A</span></p>
+            <p>Momentum: <span id="current_momentum">N/A</span></p>
         </div>
     </div>
 
