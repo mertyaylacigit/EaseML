@@ -2,11 +2,10 @@ from flask import Blueprint, render_template, jsonify, request
 from torch import manual_seed, Tensor
 from torch.optim import Optimizer, SGD
 import numpy as np
-import queue
-import json
+import queue, json, pickle
 
-from ...ml.models.model import ConvolutionalNeuralNetwork
-from ...ml.trainers.training import training
+from src.ml.models.model import ConvolutionalNeuralNetwork
+from src.ml.trainers.training import training
 
 from threading import Thread
 
@@ -20,6 +19,12 @@ q = queue.Queue()
 stop_training_flag = {"stop": False} # Use a dictionary with a mutable flag so when flag flips from False to True the function call training
                                      # receives the change because the function call takes the address of mutable objects rather than a copy 
                                      # of immutable objects like stop = False, so stop = {"stop": False} is better/necessary
+
+manual_seed(seed)
+np.random.seed(seed)
+model = ConvolutionalNeuralNetwork()
+current_model = 0
+
 
 def listener():
     global q, metrics
@@ -35,10 +40,8 @@ def render():
 
 @bp.route("/start_training")
 def start_training():
-  global q, seed, stop_training_flag
-  manual_seed(seed)
-  np.random.seed(seed)
-  model = ConvolutionalNeuralNetwork()
+  global stop_training_flag, model, current_model
+
 
   # start training process in seperate thread! 
   training_thread = Thread(target=training, args=(model, False, 10, stop_training_flag, q))
@@ -145,4 +148,58 @@ def clearConfigurationHistory():
     with open(config_history_path, 'w') as file:
         json.dump({},file)
     
+    return jsonify({"success": True})
+
+
+
+
+
+
+
+
+
+
+##----------------------------------------------------------------
+##----------------------------------------------------------------
+
+
+
+
+## Model history
+
+@bp.route("/saveModel")
+def saveModel():
+    global model
+
+    current_model = model
+
+    model_history_path = 'config/model_history.pickle'  # Update the path to your model history file
+    try:
+        with open(model_history_path, 'rb') as file:
+            model_history = pickle.load(file)
+    except FileNotFoundError:
+        # If the file doesn't exist yet, create an empty dictionary
+        model_history = {}
+
+    next_index = len(model_history)
+    model_history[next_index] = current_model  # add current model to model history
+
+    with open(model_history_path, 'wb') as file:
+        pickle.dump(model_history, file)
+
+    return jsonify({"model_id": next_index})
+
+
+@bp.route("/removeModel")
+def removeModel():
+    print(request.args.get("model_id"))
+    return jsonify({"success": True})
+
+
+@bp.route("/clearModelHistory")
+def clearModelHistory():
+    model_history_path = 'config/model_history.pickle'  # Update the path to your model history file
+    with open(model_history_path, 'wb') as file:
+        pickle.dump({}, file)
+
     return jsonify({"success": True})

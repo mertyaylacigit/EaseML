@@ -1,6 +1,7 @@
 # Ignore config files
 config/config_history.json
 config/training_config.json
+config/model_history.pickle
 
 
 # Byte-compiled / optimized / DLL files

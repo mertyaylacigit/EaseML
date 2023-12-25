@@ -75,7 +75,7 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, queue: Queue 
 
                     batchCounter += 1
                     print("batch done")
-
+                    
                     while stop['stop']:
                         time.sleep(0.1)  # Sleep to prevent busy waiting
                         # Check for updates only if stop flag is active
@@ -85,7 +85,7 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, queue: Queue 
 
         else:
             time.sleep(0.1)  # Sleep if training is stopped
-
+            
 
 def main(seed):
     print("init...")
