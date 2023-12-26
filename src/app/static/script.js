@@ -17,8 +17,11 @@ const parameter_controls = document.getElementById("parameter_controls")
 stop_btn.disabled = true
 continue_btn.disabled = true
 
+//global Parameters
 var last_batch = 0
-
+var refDataset = 0
+var lastAcc = -1
+var lastLoss = -1
 
 
 function start_training(){
@@ -102,23 +105,78 @@ function continue_training(){
 }
 
 
+function addNewDataset(chart) {
+  var label = 'New Parameters ' + refDataset;
+  var newDataset = {
+    label: label,
+    borderColor: getRandomColor,
+    data: [],
+    fill: false,
+  };
+
+
+  chart.data.datasets.push(newDataset);
+
+  chart.update();
+}
+
+
+function updateCharts(data){
+
+  // Checks if point is "new"
+  if(lastAcc != data.acc || lastLoss != data.loss){
+    last_batch = last_batch +1;
+    updateChart(data.acc, accChart);
+    updateChart(data.loss, lossChart);
+    lastAcc = data.acc;
+    lastLoss = data.loss;
+  }
+}
 
 function updateChart(dataPoint, chart) {
+
   
-  // Checks if point is "new"
-  if (dataPoint > 0 && dataPoint !== chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1]) {
+  
+  // format Data
+    var point = {
+      x: last_batch,
+      y: dataPoint,
+    };
+
   // Add a new data point to the chart
-  last_batch = last_batch +1
+  console.log(last_batch)
   chart.data.labels.push(last_batch)
-  chart.data.datasets[0].data.push(dataPoint)
+  chart.data.datasets[refDataset].data.push(point)
 
+  drawVerticalLine(chart, last_batch);
+
+  chart.update()
+    
+}
+
+//doesnt work for some reason
+function drawVerticalLine(chart, xValue) {
+  var ctx = chart.ctx;
+  var xAxis = chart.scales.x;
+  var yAxis = chart.scales.y;
+  var xValue = 10;  
+
+
+
+  console.log('Drawing vertical line at X:', xAxis.getPixelForValue(xValue));
+  console.log('Drawing vertical line at Y:', yAxis.bottom);
+
+  ctx.save();
 
   
-  // Update the chart
-  chart.update()
-  lossChart.update()
+  ctx.beginPath();
+  ctx.moveTo(xAxis.getPixelForValue(xValue), yAxis.top);
+  ctx.lineTo(xAxis.getPixelForValue(xValue), yAxis.bottom);
+  ctx.strokeStyle = 'rgba(255, 0, 0)';  
+  ctx.lineWidth = 1;  
+  ctx.stroke();
 
-  }
+  ctx.restore();
 }
 
 
@@ -131,10 +189,8 @@ function update_accuracy(){
     })
     .then(data => {
       console.log("Recieved Data:", data)
-      updateChart(data.acc, accChart)
-      updateChart(data.loss, lossChart)
+      updateCharts(data);
       accuracy_span.textContent = data.acc
-      //updateChart(data.loss, lossChart)
     })
 }
 
@@ -184,6 +240,10 @@ function toggleInfo(panelId, btn) {
 
 
 
+
+
+
+
 accChart = new Chart(ac_chart, {
   type: 'line',
   data: {
@@ -201,6 +261,10 @@ accChart = new Chart(ac_chart, {
       x: {
         type: 'linear',
         position: 'bottom'
+      },
+      y: {
+        type: 'linear',
+        position: 'left'
       }
     }
   }
@@ -212,7 +276,7 @@ lossChart = new Chart(l_chart, {
     labels: [],
     datasets: [{
       label: 'Loss',
-      borderColor: 'rgb(255, 75, 75)',
+      borderColor: getRandomColor(),
       data: [],
       fill: false
     }]
@@ -223,10 +287,30 @@ lossChart = new Chart(l_chart, {
       x: {
         type: 'linear',
         position: 'bottom'
+        },
+      y: {
+        type: 'linear',
+        position: 'left'
+        }
       }
     }
   }
-});
+);
+
+
+
+
+
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 
 
 
@@ -263,6 +347,9 @@ update_params_btn.addEventListener("click", function() {
       },
       "batch_size": parseInt(batch_size_slider.value)
   };
+  refDataset = refDataset + 1;
+  addNewDataset(lossChart);
+  addNewDataset(accChart);
   updateTrainingParams(newParams);
 });
 
