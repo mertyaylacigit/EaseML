@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, jsonify, request, send_file
 from torch import manual_seed, Tensor
 from torch.optim import Optimizer, SGD
 import numpy as np
-import queue, json, pickle
+import queue, json, pickle, os, sys
 
 from src.ml.models.model import ConvolutionalNeuralNetwork
 from src.ml.trainers.training import training
@@ -203,3 +203,23 @@ def clearModelHistory():
         pickle.dump({}, file)
 
     return jsonify({"success": True})
+
+@bp.route("/downloadModel")
+def downloadModel():
+    model_history_path = 'config/model_history.pickle'
+    model_id = int(request.args.get("model_id"))
+    model_path = "config/model" + str(model_id) + ".pickle"
+
+    print(model_id, type(model_id))
+
+    with open(model_history_path, 'rb') as file:
+        model_history = pickle.load(file)
+
+    with open(model_path, 'wb') as file:
+        pickle.dump(model_history[model_id], file)
+
+    with open(model_path, "rb") as file:
+        modeltest = pickle.load(file)
+        print(type(modeltest))
+
+    return send_file(os.getcwd() + "/" + model_path, as_attachment=True)

@@ -192,10 +192,12 @@ clear_config_history_btn.addEventListener("click", clearConfigurationHistory)
 const save_model_btn = document.getElementById("save_model")
 const remove_model_btn = document.getElementById("remove_model")
 const clear_model_history_btn = document.getElementById("clear_model_history")
+const download_model_btn = document.getElementById("download_model")
 const modelList_div = document.getElementById("modelList")
 
 remove_model_btn.disabled = true;
 clear_model_history_btn.disabled = true;
+download_model_btn.disabled = true;
 
 var current_model_id = -1
 
@@ -268,10 +270,12 @@ function createModelItem(data){
 
   newModel.addEventListener("click",function(){
     remove_model_btn.disabled = false
+    download_model_btn.disabled = false
     save_model_btn.disabled = true
     clear_model_history_btn.disabled = true
     current_model_id = newModel.id
     newModel.classList.add("increasedDensity")
+    console.log(current_model_id);
   })
 
   modelList_div.appendChild(newModel)
@@ -298,6 +302,40 @@ function clearModelHistory(){
   clear_model_history_btn.disabled = true
 }
 
+function downloadModel(model_id){
+  const model_id_num = parseInt(model_id.split("-")[1]) // take the id out of the string
+  fetch(`/downloadModel?model_id=${encodeURIComponent(model_id_num)}`)
+  .then(response => {
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.blob();
+  })
+  .then(blob => {
+    const url = window.URL.createObjectURL(blob);
+
+    console.log(url);
+
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = model_id+".pickle";
+
+
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  })
+  .catch(error => {
+      console.error('Error:', error);
+  });
+  
+}
+
+
 
 //------EventListener---------------------------------------------
 
@@ -306,6 +344,7 @@ document.addEventListener('click', function(event) {
   if (!event.target.classList.contains("model-item")){
     save_model_btn.disabled = false
     remove_model_btn.disabled = true
+    download_model_btn.disabled = true
     var current_model_id = -1
 
     if(!modelList_div.querySelectorAll("button").length == 0){
@@ -328,6 +367,7 @@ document.addEventListener('click', function(event) {
 save_model_btn.addEventListener("click", saveModel)
 remove_model_btn.addEventListener("click", () => removeModel(current_model_id))
 clear_model_history_btn.addEventListener("click", clearModelHistory)
+download_model_btn.addEventListener("click", () => downloadModel(current_model_id))
 
 
 
