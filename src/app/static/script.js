@@ -22,6 +22,7 @@ var last_batch = 0
 var refDataset = 0
 var lastAcc = -1
 var lastLoss = -1
+let verLines = []
 
 
 function start_training(){
@@ -107,12 +108,22 @@ function continue_training(){
 
 function addNewDataset(chart) {
   var label = 'New Parameters ' + refDataset;
+  var color = getRandomColor()
+
+  var existingPoint = {
+    x:last_batch ,
+    y:chart.data.datasets[refDataset - 1].data[chart.data.datasets[refDataset - 1 ].data.length -1].y
+  };
+
+  console.log(existingPoint)
   var newDataset = {
     label: label,
-    borderColor: getRandomColor,
-    data: [],
+    borderColor: color,
+    data: [existingPoint],
     fill: false,
   };
+
+  addVerticalLine(last_batch);
 
 
   chart.data.datasets.push(newDataset);
@@ -144,39 +155,31 @@ function updateChart(dataPoint, chart) {
     };
 
   // Add a new data point to the chart
-  console.log(last_batch)
+  //console.log(last_batch)
   chart.data.labels.push(last_batch)
   chart.data.datasets[refDataset].data.push(point)
 
-  drawVerticalLine(chart, last_batch);
+
 
   chart.update()
     
 }
 
-//doesnt work for some reason
-function drawVerticalLine(chart, xValue) {
-  var ctx = chart.ctx;
-  var xAxis = chart.scales.x;
-  var yAxis = chart.scales.y;
-  var xValue = 10;  
-
-
-
-  console.log('Drawing vertical line at X:', xAxis.getPixelForValue(xValue));
-  console.log('Drawing vertical line at Y:', yAxis.bottom);
-
-  ctx.save();
-
-  
-  ctx.beginPath();
-  ctx.moveTo(xAxis.getPixelForValue(xValue), yAxis.top);
-  ctx.lineTo(xAxis.getPixelForValue(xValue), yAxis.bottom);
-  ctx.strokeStyle = 'rgba(255, 0, 0)';  
-  ctx.lineWidth = 1;  
-  ctx.stroke();
-
-  ctx.restore();
+function addVerticalLine(value) {
+  const newLine = {
+    type: 'line',
+    mode: 'vertical',
+    scaleID: 'x',
+    value: value,
+    borderColor: getRandomColor(),
+    borderWidth: 2,
+    label: {
+      content: 'test',
+      enabled: true,
+      position: 'top'
+    }
+  };
+  verLines.push(newLine);
 }
 
 
@@ -188,7 +191,7 @@ function update_accuracy(){
       }
     })
     .then(data => {
-      console.log("Recieved Data:", data)
+      //console.log("Recieved Data:", data)
       updateCharts(data);
       accuracy_span.textContent = data.acc
     })
@@ -244,6 +247,8 @@ function toggleInfo(panelId, btn) {
 
 
 
+
+
 accChart = new Chart(ac_chart, {
   type: 'line',
   data: {
@@ -265,6 +270,11 @@ accChart = new Chart(ac_chart, {
       y: {
         type: 'linear',
         position: 'left'
+      }
+    },
+      plugins: {
+      annotation: {
+        annotations: verLines
       }
     }
   }
@@ -291,6 +301,11 @@ lossChart = new Chart(l_chart, {
       y: {
         type: 'linear',
         position: 'left'
+        }
+      },
+      plugins: {
+        annotation: {
+          annotations: verLines
         }
       }
     }
@@ -322,12 +337,12 @@ stop_btn.addEventListener("click", stop_training)
 continue_btn.addEventListener("click", continue_training)
 
 batch_size_slider.oninput = function() {
-  console.log("Batch size slider value: " + this.value); // Debugging log
+  //console.log("Batch size slider value: " + this.value); // Debugging log
   document.getElementById("batch_size_value").textContent = this.value;
 }
 
 learning_rate_slider.oninput = function() {
-  console.log("Learning rate slider value: " + this.value); // Debugging log
+  //console.log("Learning rate slider value: " + this.value); // Debugging log
   document.getElementById("learning_rate_value").textContent = this.value;
 }
 
