@@ -17,8 +17,12 @@ const parameter_controls = document.getElementById("parameter_controls")
 stop_btn.disabled = true
 continue_btn.disabled = true
 
+//global Parameters
 var last_batch = 0
-
+var refDataset = 0
+var lastAcc = -1
+var lastLoss = -1
+let verLines = []
 
 
 function start_training(){
@@ -102,23 +106,80 @@ function continue_training(){
 }
 
 
+function addNewDataset(chart) {
+  var label = 'New Parameters ' + refDataset;
+  var color = getRandomColor()
+
+  var existingPoint = {
+    x:last_batch ,
+    y:chart.data.datasets[refDataset - 1].data[chart.data.datasets[refDataset - 1 ].data.length -1].y
+  };
+
+  console.log(existingPoint)
+  var newDataset = {
+    label: label,
+    borderColor: color,
+    data: [existingPoint],
+    fill: false,
+  };
+
+  addVerticalLine(last_batch);
+
+
+  chart.data.datasets.push(newDataset);
+
+  chart.update();
+}
+
+
+function updateCharts(data){
+
+  // Checks if point is "new"
+  if(lastAcc != data.acc || lastLoss != data.loss){
+    last_batch = last_batch +1;
+    updateChart(data.acc, accChart);
+    updateChart(data.loss, lossChart);
+    lastAcc = data.acc;
+    lastLoss = data.loss;
+  }
+}
 
 function updateChart(dataPoint, chart) {
+
   
-  // Checks if point is "new"
-  if (dataPoint > 0 && dataPoint !== chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1]) {
+  
+  // format Data
+    var point = {
+      x: last_batch,
+      y: dataPoint,
+    };
+
   // Add a new data point to the chart
-  last_batch = last_batch +1
+  //console.log(last_batch)
   chart.data.labels.push(last_batch)
-  chart.data.datasets[0].data.push(dataPoint)
+  chart.data.datasets[refDataset].data.push(point)
 
 
-  
-  // Update the chart
+
   chart.update()
-  lossChart.update()
+    
+}
 
-  }
+function addVerticalLine(value) {
+  const newLine = {
+    type: 'line',
+    mode: 'vertical',
+    scaleID: 'x',
+    value: value,
+    borderColor: getRandomColor(),
+    borderWidth: 2,
+    label: {
+      content: 'test',
+      enabled: true,
+      position: 'top'
+    }
+  };
+  verLines.push(newLine);
 }
 
 
@@ -130,11 +191,9 @@ function update_accuracy(){
       }
     })
     .then(data => {
-      console.log("Recieved Data:", data)
-      updateChart(data.acc, accChart)
-      updateChart(data.loss, lossChart)
+      //console.log("Recieved Data:", data)
+      updateCharts(data);
       accuracy_span.textContent = data.acc
-      //updateChart(data.loss, lossChart)
     })
 }
 
@@ -184,6 +243,12 @@ function toggleInfo(panelId, btn) {
 
 
 
+
+
+
+
+
+
 accChart = new Chart(ac_chart, {
   type: 'line',
   data: {
@@ -201,6 +266,15 @@ accChart = new Chart(ac_chart, {
       x: {
         type: 'linear',
         position: 'bottom'
+      },
+      y: {
+        type: 'linear',
+        position: 'left'
+      }
+    },
+      plugins: {
+      annotation: {
+        annotations: verLines
       }
     }
   }
@@ -212,7 +286,7 @@ lossChart = new Chart(l_chart, {
     labels: [],
     datasets: [{
       label: 'Loss',
-      borderColor: 'rgb(255, 75, 75)',
+      borderColor: getRandomColor(),
       data: [],
       fill: false
     }]
@@ -223,10 +297,35 @@ lossChart = new Chart(l_chart, {
       x: {
         type: 'linear',
         position: 'bottom'
+        },
+      y: {
+        type: 'linear',
+        position: 'left'
+        }
+      },
+      plugins: {
+        annotation: {
+          annotations: verLines
+        }
       }
     }
   }
-});
+);
+
+
+
+
+
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 
 
 
@@ -238,12 +337,12 @@ stop_btn.addEventListener("click", stop_training)
 continue_btn.addEventListener("click", continue_training)
 
 batch_size_slider.oninput = function() {
-  console.log("Batch size slider value: " + this.value); // Debugging log
+  //console.log("Batch size slider value: " + this.value); // Debugging log
   document.getElementById("batch_size_value").textContent = this.value;
 }
 
 learning_rate_slider.oninput = function() {
-  console.log("Learning rate slider value: " + this.value); // Debugging log
+  //console.log("Learning rate slider value: " + this.value); // Debugging log
   document.getElementById("learning_rate_value").textContent = this.value;
 }
 
@@ -263,6 +362,9 @@ update_params_btn.addEventListener("click", function() {
       },
       "batch_size": parseInt(batch_size_slider.value)
   };
+  refDataset = refDataset + 1;
+  addNewDataset(lossChart);
+  addNewDataset(accChart);
   updateTrainingParams(newParams);
 });
 
