@@ -241,7 +241,7 @@ body {
 /* Continue the pattern for all rows and nodes */
 
 /* Configuration area */
-.config-list {
+.config-list, .model-list {
   border: 1px solid #ddd;
   background-color: #f8f8f8;
   padding: 10px;
@@ -251,13 +251,21 @@ body {
   overflow-y: auto; /* Allows scrolling if content overflows */
 }
 
-.config-list p {
+.config-list p, .model-list p {
   color: #666;
   text-align: center;
 }
 
 .increasedDensity {
-  background-color: #003b79 !important;
+  background-color: #dce4f7 !important;
+}
+
+.history-selector {
+  text-align: right;
+}
+
+.model-item, .configuration-item {
+  margin-right: 10px;
 }
 
 

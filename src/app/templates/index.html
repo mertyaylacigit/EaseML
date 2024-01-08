@@ -128,17 +128,36 @@
 
         <!-- Configuration area / Additional area -->
         <div class="additional-buttons">
-            <h3>Configuration History</h3>
-            <!-- Configuration List Box -->
-            <div id="configurationList" class="config-list">
-                <p>No configurations saved yet.</p>
+            <div class="history-selector">
+                <button id="select_config_btn">Configuration</button>
+                <button id="select_model_btn">Model</button>
             </div>
+            <div id="configuration-history">
+                <h3>Configuration History</h3>
+                <!-- Configuration List Box -->
+                <div id="configurationList" class="config-list">
+                    <p>No configurations saved yet.</p>
+                </div>
 
-            <button id="save_config">Save Configuration</button>
-            <button id="remove_config">Remove Config</button>
-            <button id="load_config">Load Config</button>
-            <br>
-            <button id="clear_config_history">Clear Configuration History</button>
+                <button id="save_config">Save Configuration</button>
+                <button id="remove_config">Remove Config</button>
+                <button id="load_config">Load Config</button>
+                <br>
+                <button id="clear_config_history">Clear Configuration History</button>
+            </div>
+            <div hidden id="model-history">
+                <h3>Model History</h3>
+                <!-- Configuration List Box -->
+                <div id="modelList" class="model-list">
+                    <p>No configurations saved yet.</p>
+                </div>
+
+                <button id="save_model">Save Model</button>
+                <button id="remove_model">Remove Model</button>
+                <button id="download_model">Download Model</button>
+                <br>
+                <button id="clear_model_history">Clear Model History</button>        
+            </div>
         </div>
     </div>
 
