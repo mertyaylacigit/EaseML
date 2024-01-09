@@ -23,6 +23,7 @@ var refDataset = 0
 var lastAcc = -1
 var lastLoss = -1
 let verLines = []
+var receviedData = false  //lazy Solution but it works
 
 
 function start_training(){
@@ -141,6 +142,7 @@ function updateCharts(data){
     updateChart(data.loss, lossChart);
     lastAcc = data.acc;
     lastLoss = data.loss;
+    receviedData = true
   }
 }
 
@@ -362,9 +364,12 @@ update_params_btn.addEventListener("click", function() {
       },
       "batch_size": parseInt(batch_size_slider.value)
   };
-  refDataset = refDataset + 1;
-  addNewDataset(lossChart);
-  addNewDataset(accChart);
+  if (receviedData)
+  {
+    refDataset = refDataset + 1;
+    addNewDataset(lossChart);
+    addNewDataset(accChart);
+  }
   updateTrainingParams(newParams);
 });
 
