@@ -3,6 +3,7 @@ from torch import manual_seed, Tensor
 from torch.optim import Optimizer, SGD
 import numpy as np
 import queue, json, pickle, os, sys
+import torch, flask
 
 from src.ml.models.model import ConvolutionalNeuralNetwork
 from src.ml.trainers.training import training
@@ -36,6 +37,11 @@ def listener():
 @bp.route("/")
 def render():
   return render_template("index.html")
+
+@bp.route("/playground")
+def render_playground():
+  return render_template("playground.html")
+  
 
 
 @bp.route("/start_training")
@@ -159,6 +165,7 @@ def clearConfigurationHistory():
 
 
 
+
 ##----------------------------------------------------------------
 ##----------------------------------------------------------------
 
@@ -223,3 +230,56 @@ def downloadModel():
         print(type(modeltest))
 
     return send_file(os.getcwd() + "/" + model_path, as_attachment=True)
+
+
+
+
+
+
+
+
+##----------------------------------------------------------------
+##----------------------------------------------------------------
+
+
+
+
+## Playground
+
+@bp.route("/predict", methods=['POST'])
+def predict():
+
+    batch_size = 1
+    channels = 1  # Grayscale image
+    height = 28
+    width = 28
+
+    data = request.json
+    print(data) 
+    data = np.array(data)
+    print(data)
+    data_reshaped = data.reshape(1,1,28,28)
+    X = torch.Tensor(data_reshaped)
+    print(X)
+
+
+    try:
+        config_path = 'config/model_pretrained.pickle'
+        with open(config_path, 'rb') as file:
+            model = pickle.load(file)
+            model.eval()
+            with torch.no_grad():
+                prediction_array = model(X)
+                prediction_array = prediction_array.numpy()
+                prediction_array_softmax = np.exp(prediction_array) / np.sum(np.exp(prediction_array))
+                print(prediction_array_softmax)
+                prediction = {"label": int(np.argmax(prediction_array_softmax)),
+                              "probability": round(float(np.max(prediction_array_softmax)), 2)}
+            print(prediction)
+        return jsonify(prediction)
+    except Exception as e:
+        print("hää")
+        return jsonify({"error": str(e)})
+    
+
+
