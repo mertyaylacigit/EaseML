@@ -23,14 +23,45 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
-.navbar span {
+.navbar .easeML {
   font-size: 24px;
   font-weight: bold;
+  text-decoration: none;
+  color: #007bff;
 }
 
 .hamburger-menu {
   font-size: 24px;
   cursor: pointer;
+}
+
+nav .left{
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+nav ul {
+  display: flex;
+  gap: 20px;
+  list-style-type: none;
+}
+
+nav ul li a {
+  display: inline-block;
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.new-tag {
+  background-color: green;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 5px;
 }
 
 .main-content {
