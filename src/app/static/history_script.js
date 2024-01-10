@@ -18,6 +18,7 @@ var current_config_id = -1
 //-----------functions-------------------------------------------
 
 // imported functions 
+
 function updateTrainingParams(newParams) {
   fetch('/update_params', {
       method: 'POST',
@@ -41,10 +42,12 @@ function updateCurrentParameters() {
           if(data.error) {
               console.error("Failed to fetch current parameters:", data.error);
           } else {
+              console.log("Fetched Parameters:", data);
               document.getElementById("current_batch_size").textContent = data.batch_size || "N/A";
               document.getElementById("current_learning_rate").textContent = data.lr || "N/A";
               document.getElementById("current_momentum").textContent = data.momentum || "N/A";
-              updateSliders(data)
+              document.getElementById("current_loss_function").textContent = data.loss_function || "N/A";
+              updateSliders(data);
           }
       })
       .catch(error => {
@@ -53,14 +56,19 @@ function updateCurrentParameters() {
 }
 
 function updateSliders(data){
-  document.getElementById("batch_size_slider").value = data.batch_size
-  document.getElementById("batch_size_value").textContent = data.batch_size
-  document.getElementById("learning_rate_slider").value = data.lr
-  document.getElementById("learning_rate_value").textContent = data.lr
-  document.getElementById("momentum_slider").value = data.momentum
-  document.getElementById("momentum_value").textContent = data.momentum
-
+  // Update sliders for batch size, learning rate, and momentum
+  document.getElementById("batch_size_slider").value = data.batch_size;
+  document.getElementById("batch_size_value").textContent = data.batch_size;
+  document.getElementById("learning_rate_slider").value = data.lr;
+  document.getElementById("learning_rate_value").textContent = data.lr;
+  document.getElementById("momentum_slider").value = data.momentum;
+  document.getElementById("momentum_value").textContent = data.momentum;
+  // Update loss function dropdown
+  if (data.loss_function) {
+    document.getElementById("loss_function").value = data.loss_function;
+  }
 }
+
 
 //------------------------------------------------
 
@@ -227,10 +235,12 @@ function updateCurrentParameters() {
           if(data.error) {
               console.error("Failed to fetch current parameters:", data.error);
           } else {
+              console.log("Fetched Parameters:", data);
               document.getElementById("current_batch_size").textContent = data.batch_size || "N/A";
               document.getElementById("current_learning_rate").textContent = data.lr || "N/A";
               document.getElementById("current_momentum").textContent = data.momentum || "N/A";
-              updateSliders(data)
+              document.getElementById("current_loss_function").textContent = data.loss_function || "N/A";
+              updateSliders(data);
           }
       })
       .catch(error => {
@@ -239,12 +249,17 @@ function updateCurrentParameters() {
 }
 
 function updateSliders(data){
-  document.getElementById("batch_size_slider").value = data.batch_size
-  document.getElementById("batch_size_value").textContent = data.batch_size
-  document.getElementById("learning_rate_slider").value = data.lr
-  document.getElementById("learning_rate_value").textContent = data.lr
-  document.getElementById("momentum_slider").value = data.momentum
-  document.getElementById("momentum_value").textContent = data.momentum
+  // Update sliders for batch size, learning rate, and momentum
+  document.getElementById("batch_size_slider").value = data.batch_size;
+  document.getElementById("batch_size_value").textContent = data.batch_size;
+  document.getElementById("learning_rate_slider").value = data.lr;
+  document.getElementById("learning_rate_value").textContent = data.lr;
+  document.getElementById("momentum_slider").value = data.momentum;
+  document.getElementById("momentum_value").textContent = data.momentum;
+  // Update loss function dropdown
+  if (data.loss_function) {
+    document.getElementById("loss_function").value = data.loss_function;
+  }
 }
 
 //------------------------------------------------

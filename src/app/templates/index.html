@@ -32,6 +32,28 @@
         <!-- Parameter Options -->
         <div class="parameter-options">
             <h3>Model Configuration</h3>
+
+            <!-- Loss Function Selection -->
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="loss_function">Loss Function:</label>
+                    <button class="info-button" onclick="toggleInfo('loss_function_info', this)">▼</button>
+                </div>
+                <select id="loss_function" onchange="updateSpecificLossFunctionInfo()">
+                    <option value="cross_entropy">Cross Entropy</option>
+                    <option value="nll_loss">Negative Log Likelihood</option>
+                    <!-- Add other loss functions as needed -->
+                </select>
+            </div>
+
+            <!-- Specific Infobox for Chosen Loss Function -->
+            <div id="loss_function_info" class="info-panel" style="display: none;">
+                <p>Loss functions measure how well the model performs. Different functions are suitable for different types of tasks.</p>
+                <p id="specific_loss_function_description">Select a loss function to see more details here.</p>
+            </div>
+
+
+            <!-- Other parameters -->
             <div class="slider-container">
                 <div class="slider-header">
                     <label for="batch_size_slider">Batch Size:</label>
@@ -209,6 +231,7 @@
             <h3>Current Parameters</h3>
             <p> </p>
             <p>Accuracy: <span id="accuracy">N/A</span></p>
+            <p>Loss Function: <span id="current_loss_function">N/A</span></p>
             <p>Batch Size: <span id="current_batch_size">N/A</span></p>
             <p>Learning Rate: <span id="current_learning_rate">N/A</span></p>
             <p>Momentum: <span id="current_momentum">N/A</span></p>
@@ -222,16 +245,18 @@
             neuralNetworkAnimation.style.display = 'flex';
 
             let newParams = {
-                "optimizer_params": {
-                    "type": "SGD", // Assuming 'SGD' is your desired optimizer
-                    "args": {
-                        "lr": parseFloat(document.getElementById("learning_rate_slider").value),
-                        "momentum": parseFloat(document.getElementById("momentum_slider").value)
-                    }
-                },
-                "batch_size": parseInt(document.getElementById("batch_size_slider").value)
+            "optimizer_params": {
+                "type": "SGD",
+                "args": {
+                "lr": 0.3,
+                "momentum": 0.5
+                }
+            },
+            "batch_size": 256,
+            "loss_function": "cross_entropy"
             };
             updateTrainingParams(newParams); // Initialize parameter config
+            updateSpecificLossFunctionInfo();
         };
     </script>
 </body>

@@ -11,6 +11,7 @@ const learning_rate_slider = document.getElementById("learning_rate_slider")
 const momenum_slider = document.getElementById("momentum_slider")
 const update_params_btn = document.getElementById("update_params_btn")
 const parameter_controls = document.getElementById("parameter_controls")
+const loss_function_dropdown = document.getElementById("loss_function");
 
 
 // deactivate stop and continue button
@@ -49,6 +50,7 @@ function start_training(){
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
       momentum_slider.disabled = true;
+      loss_function_dropdown.disabled = true;
       update_params_btn.disabled = true;
       updateCurrentParameters();
     })
@@ -75,6 +77,7 @@ function stop_training(){
       batch_size_slider.disabled = false;
       learning_rate_slider.disabled = false;
       momentum_slider.disabled = false;
+      loss_function_dropdown.disabled = false;
       update_params_btn.disabled = false;
     })
 }
@@ -101,6 +104,7 @@ function continue_training(){
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
       momentum_slider.disabled = true;
+      loss_function_dropdown.disabled = true;
       update_params_btn.disabled = true;
       updateCurrentParameters();
     })  
@@ -222,9 +226,11 @@ function updateCurrentParameters() {
           if(data.error) {
               console.error("Failed to fetch current parameters:", data.error);
           } else {
+              console.log("Fetched Parameters:", data);
               document.getElementById("current_batch_size").textContent = data.batch_size || "N/A";
               document.getElementById("current_learning_rate").textContent = data.lr || "N/A";
               document.getElementById("current_momentum").textContent = data.momentum || "N/A";
+              document.getElementById("current_loss_function").textContent = data.loss_function || "N/A";
           }
       })
       .catch(error => {
@@ -243,7 +249,22 @@ function toggleInfo(panelId, btn) {
   }
 }
 
+function updateSpecificLossFunctionInfo() {
+    var lossFunction = document.getElementById("loss_function").value;
+    var description = "";
 
+    switch(lossFunction) {
+        case "cross_entropy":
+            description = "Cross Entropy: Ideal for classification tasks, measures the difference between two probability distributions.";
+            break;
+        case "nll_loss":
+            description = "Negative Log Likelihood: Used with models providing log probabilities, often combined with LogSoftmax layer.";
+            break;
+        // Add cases for other loss functions
+    }
+
+    document.getElementById("specific_loss_function_description").textContent = description;
+}
 
 
 
@@ -362,7 +383,8 @@ update_params_btn.addEventListener("click", function() {
               // Add any other arguments your optimizer requires
           }
       },
-      "batch_size": parseInt(batch_size_slider.value)
+      "batch_size": parseInt(batch_size_slider.value),
+      "loss_function": loss_function_dropdown.value
   };
   if (receviedData)
   {
