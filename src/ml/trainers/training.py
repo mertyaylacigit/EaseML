@@ -71,27 +71,16 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, queue: Queue 
     config_path = 'config/training_config.json'
     optimizer_params, batch_size, loss_function_name = check_for_initial_params(config_path)
     loss_function, apply_log_softmax = get_loss_function(loss_function_name)
-    train_loader, test_loader = get_data_loaders(batch_size=batch_size)
 
     while True:
         if not stop['stop']:  # If not stopped, start/resume training
+            train_loader, test_loader = get_data_loaders(batch_size=batch_size)
             if cuda:
                 model.cuda()
-
-            optimizer_params, batch_size, loss_function_name = check_for_initial_params(config_path)
-            loss_function, apply_log_softmax = get_loss_function(loss_function_name)
-            train_loader, test_loader = get_data_loaders(batch_size=batch_size)
 
             optimizer = create_optimizer(model, optimizer_params)  # Create optimizer with parameters
 
             for epoch in range(n_epochs):
-                new_optimizer_params, new_batch_size, new_loss_function_name = check_for_updates(config_path)
-                if new_optimizer_params != optimizer_params or new_batch_size != batch_size or new_loss_function_name != loss_function_name:
-                    optimizer_params, batch_size, loss_function_name = new_optimizer_params, new_batch_size, new_loss_function_name
-                    loss_function, apply_log_softmax = get_loss_function(loss_function_name)
-                    train_loader, test_loader = get_data_loaders(batch_size=batch_size)
-                    optimizer = create_optimizer(model, optimizer_params)
-
                 batchCounter = 1
                 for batch in train_loader:
                     data, target = batch
@@ -108,12 +97,12 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, queue: Queue 
                         time.sleep(0.1)  # Sleep to prevent busy waiting
                         # Check for updates only if stop flag is active
                         if stop['stop']:
-                            optimizer_params, batch_size = check_for_updates(config_path)
+                            optimizer_params, batch_size, loss_function_name = check_for_updates(config_path)
                             optimizer = create_optimizer(model, optimizer_params)  # Update optimizer if necessary
-
+                            loss_function, apply_log_softmax = get_loss_function(loss_function_name)
         else:
             time.sleep(0.1)  # Sleep if training is stopped
-            
+
 
 def main(seed):
     print("init...")
