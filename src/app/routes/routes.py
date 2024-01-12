@@ -73,11 +73,18 @@ def continue_training():
 
 @bp.route("/update_params", methods=['POST'])
 def update_params():
-    data = request.json # Training parameters should be saved in json format
+    data = request.json
     try:
         config_path = 'config/training_config.json'
+        with open(config_path, 'r') as file:
+            current_config = json.load(file)
+
+        # Update the config with new values
+        current_config.update(data)
+
         with open(config_path, 'w') as file:
-            json.dump(data, file)
+            json.dump(current_config, file)
+
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
@@ -92,10 +99,12 @@ def get_current_params():
         current_params = {
             'lr': config['optimizer_params']['args']['lr'],
             'momentum': config['optimizer_params']['args']['momentum'],
-            'batch_size': config['batch_size']
+            'batch_size': config['batch_size'],
+            'loss_function': config.get('loss_function')
         }
         return jsonify(current_params)
     except Exception as e:
+        print("Error while fetching parameters:", str(e))  # Log the error
         return jsonify({"error": str(e)})
 
 @bp.route("/get_accuracy")

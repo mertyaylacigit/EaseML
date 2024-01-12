@@ -199,6 +199,36 @@ nav ul li a {
   margin-bottom: 10px;
 }
 
+.parameter-options select {
+  width: 100%;
+  padding: 10px;
+  margin: 5px;
+  font-size: 16px;
+  border: 2px solid #007bff; /* Blue border to match the training control section */
+  border-radius: 4px; /* Rounded corners */
+  background-color: #f7faff; /* Light blue background for a subtle effect */
+  color: #0056b3; /* Blue font color */
+  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.05); /* Slight inner shadow for a subtle depth effect */
+  transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for hover and focus */
+}
+
+.parameter-options select:focus {
+  outline: none;
+  border-color: #0056b3; /* Darker border color on focus */
+  box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2); /* Glow effect on focus */
+}
+
+.parameter-options select:hover {
+  border-color: #0056b3; /* Darker border color on hover */
+}
+
+/* Optionally, style for option elements inside the select dropdown */
+.parameter-options select option {
+  padding: 5px; /* Padding inside options */
+  background-color: white; /* White background for options */
+  color: #333; /* Default text color */
+}
+
 .neural-network {
   display: flex;
   flex-direction: column;
@@ -332,6 +362,11 @@ nav ul li a {
   margin-top: 5px;
   margin-bottom: 5px;
   border-radius: 4px;
+}
+
+.slider-label-info {
+  display: flex;
+  align-items: center;
 }
 
 /* Show the panel when it's open */

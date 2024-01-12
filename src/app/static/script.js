@@ -4,6 +4,8 @@ const continue_btn = document.getElementById("continue_training")
 const accuracy_span = document.getElementById("accuracy")
 const ac_chart = document.getElementById("accuracyChart")
 const l_chart = document.getElementById("lossChart")
+const configuration_history = document.getElementById("configuration-history")
+const model_history = document.getElementById("model-history")
 
 // dynamic parameters
 const batch_size_slider = document.getElementById("batch_size_slider")
@@ -11,6 +13,7 @@ const learning_rate_slider = document.getElementById("learning_rate_slider")
 const momenum_slider = document.getElementById("momentum_slider")
 const update_params_btn = document.getElementById("update_params_btn")
 const parameter_controls = document.getElementById("parameter_controls")
+const loss_function_dropdown = document.getElementById("loss_function");
 
 
 // deactivate stop and continue button
@@ -49,7 +52,9 @@ function start_training(){
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
       momentum_slider.disabled = true;
+      loss_function_dropdown.disabled = true;
       update_params_btn.disabled = true;
+      toggleHistoryUI(false);
       updateCurrentParameters();
     })
 }
@@ -75,7 +80,9 @@ function stop_training(){
       batch_size_slider.disabled = false;
       learning_rate_slider.disabled = false;
       momentum_slider.disabled = false;
+      loss_function_dropdown.disabled = false;
       update_params_btn.disabled = false;
+      toggleHistoryUI(true);
     })
 }
 
@@ -101,7 +108,11 @@ function continue_training(){
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
       momentum_slider.disabled = true;
+      loss_function_dropdown.disabled = true;
       update_params_btn.disabled = true;
+      configuration_history.disabled = true;
+      model_history.disabled = true;
+      toggleHistoryUI(false);
       updateCurrentParameters();
     })  
 }
@@ -125,10 +136,7 @@ function addNewDataset(chart) {
   };
 
   addVerticalLine(last_batch);
-
-
   chart.data.datasets.push(newDataset);
-
   chart.update();
 }
 
@@ -147,9 +155,6 @@ function updateCharts(data){
 }
 
 function updateChart(dataPoint, chart) {
-
-  
-  
   // format Data
     var point = {
       x: last_batch,
@@ -160,9 +165,6 @@ function updateChart(dataPoint, chart) {
   //console.log(last_batch)
   chart.data.labels.push(last_batch)
   chart.data.datasets[refDataset].data.push(point)
-
-
-
   chart.update()
     
 }
@@ -199,6 +201,9 @@ function update_accuracy(){
     })
 }
 
+// -------------------------------
+// mirrored functions - need to be updated both here and in history_script.js
+
 function updateTrainingParams(newParams) {
   fetch('/update_params', {
       method: 'POST',
@@ -208,11 +213,13 @@ function updateTrainingParams(newParams) {
       body: JSON.stringify(newParams),
   })
   .then(response => response.json())
-  .then(data => console.log(data))
+  .then(data => {
+      console.log(data);
+      updateCurrentParameters(); // Call after successful update
+  })
   .catch((error) => {
       console.error('Error:', error);
   });
-  updateCurrentParameters();
 }
 
 function updateCurrentParameters() {
@@ -222,15 +229,19 @@ function updateCurrentParameters() {
           if(data.error) {
               console.error("Failed to fetch current parameters:", data.error);
           } else {
+              console.log("Fetched Parameters:", data);
               document.getElementById("current_batch_size").textContent = data.batch_size || "N/A";
               document.getElementById("current_learning_rate").textContent = data.lr || "N/A";
               document.getElementById("current_momentum").textContent = data.momentum || "N/A";
+              document.getElementById("current_loss_function").textContent = data.loss_function || "N/A";
           }
       })
       .catch(error => {
           console.error("Error:", error);
       });
 }
+
+// -------------------------------
 
 function toggleInfo(panelId, btn) {
   var panel = document.getElementById(panelId);
@@ -243,7 +254,29 @@ function toggleInfo(panelId, btn) {
   }
 }
 
+function toggleHistoryUI(enable) {
+  configuration_history.style.pointerEvents = enable ? 'auto' : 'none';
+  configuration_history.style.opacity = enable ? '1' : '0.6';
+  model_history.style.pointerEvents = enable ? 'auto' : 'none';
+  model_history.style.opacity = enable ? '1' : '0.6';
+}
 
+function updateSpecificLossFunctionInfo() {
+    var lossFunction = document.getElementById("loss_function").value;
+    var description = "";
+
+    switch(lossFunction) {
+        case "cross_entropy":
+            description = "Cross Entropy: Ideal for classification tasks, measures the difference between two probability distributions.";
+            break;
+        case "nll_loss":
+            description = "Negative Log Likelihood: Used with models providing log probabilities, often combined with LogSoftmax layer.";
+            break;
+        // Add cases for other loss functions
+    }
+
+    document.getElementById("specific_loss_function_description").textContent = description;
+}
 
 
 
@@ -362,7 +395,8 @@ update_params_btn.addEventListener("click", function() {
               // Add any other arguments your optimizer requires
           }
       },
-      "batch_size": parseInt(batch_size_slider.value)
+      "batch_size": parseInt(batch_size_slider.value),
+      "loss_function": loss_function_dropdown.value
   };
   if (receviedData)
   {
