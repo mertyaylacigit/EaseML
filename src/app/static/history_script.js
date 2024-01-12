@@ -28,11 +28,13 @@ function updateTrainingParams(newParams) {
       body: JSON.stringify(newParams),
   })
   .then(response => response.json())
-  .then(data => console.log(data))
+  .then(data => {
+      console.log(data);
+      updateCurrentParameters(); // Call after successful update
+  })
   .catch((error) => {
       console.error('Error:', error);
   });
-  updateCurrentParameters();
 }
 
 function updateCurrentParameters() {

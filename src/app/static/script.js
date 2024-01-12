@@ -203,6 +203,9 @@ function update_accuracy(){
     })
 }
 
+// -------------------------------
+// mirrored functions - need to be updated both here and in history_script.js
+
 function updateTrainingParams(newParams) {
   fetch('/update_params', {
       method: 'POST',
@@ -212,11 +215,13 @@ function updateTrainingParams(newParams) {
       body: JSON.stringify(newParams),
   })
   .then(response => response.json())
-  .then(data => console.log(data))
+  .then(data => {
+      console.log(data);
+      updateCurrentParameters(); // Call after successful update
+  })
   .catch((error) => {
       console.error('Error:', error);
   });
-  updateCurrentParameters();
 }
 
 function updateCurrentParameters() {
@@ -237,6 +242,8 @@ function updateCurrentParameters() {
           console.error("Error:", error);
       });
 }
+
+// -------------------------------
 
 function toggleInfo(panelId, btn) {
   var panel = document.getElementById(panelId);
