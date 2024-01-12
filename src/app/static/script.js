@@ -4,6 +4,8 @@ const continue_btn = document.getElementById("continue_training")
 const accuracy_span = document.getElementById("accuracy")
 const ac_chart = document.getElementById("accuracyChart")
 const l_chart = document.getElementById("lossChart")
+const configuration_history = document.getElementById("configuration-history")
+const model_history = document.getElementById("model-history")
 
 // dynamic parameters
 const batch_size_slider = document.getElementById("batch_size_slider")
@@ -52,6 +54,7 @@ function start_training(){
       momentum_slider.disabled = true;
       loss_function_dropdown.disabled = true;
       update_params_btn.disabled = true;
+      toggleHistoryUI(false);
       updateCurrentParameters();
     })
 }
@@ -79,6 +82,7 @@ function stop_training(){
       momentum_slider.disabled = false;
       loss_function_dropdown.disabled = false;
       update_params_btn.disabled = false;
+      toggleHistoryUI(true);
     })
 }
 
@@ -106,6 +110,9 @@ function continue_training(){
       momentum_slider.disabled = true;
       loss_function_dropdown.disabled = true;
       update_params_btn.disabled = true;
+      configuration_history.disabled = true;
+      model_history.disabled = true;
+      toggleHistoryUI(false);
       updateCurrentParameters();
     })  
 }
@@ -129,10 +136,7 @@ function addNewDataset(chart) {
   };
 
   addVerticalLine(last_batch);
-
-
   chart.data.datasets.push(newDataset);
-
   chart.update();
 }
 
@@ -151,9 +155,6 @@ function updateCharts(data){
 }
 
 function updateChart(dataPoint, chart) {
-
-  
-  
   // format Data
     var point = {
       x: last_batch,
@@ -164,9 +165,6 @@ function updateChart(dataPoint, chart) {
   //console.log(last_batch)
   chart.data.labels.push(last_batch)
   chart.data.datasets[refDataset].data.push(point)
-
-
-
   chart.update()
     
 }
@@ -254,6 +252,13 @@ function toggleInfo(panelId, btn) {
     panel.style.display = "block";
     btn.innerHTML = "▲"; // Change to upward arrow when panel is shown
   }
+}
+
+function toggleHistoryUI(enable) {
+  configuration_history.style.pointerEvents = enable ? 'auto' : 'none';
+  configuration_history.style.opacity = enable ? '1' : '0.6';
+  model_history.style.pointerEvents = enable ? 'auto' : 'none';
+  model_history.style.opacity = enable ? '1' : '0.6';
 }
 
 function updateSpecificLossFunctionInfo() {

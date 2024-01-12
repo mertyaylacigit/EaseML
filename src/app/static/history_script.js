@@ -212,52 +212,7 @@ download_model_btn.disabled = true;
 var current_model_id = -1
 
 //-----------functions-------------------------------------------
-/*
-// imported functions
-function updateTrainingParams(newParams) {
-  fetch('/update_params', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newParams),
-  })
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch((error) => {
-      console.error('Error:', error);
-  });
-  updateCurrentParameters();
-}
 
-function updateCurrentParameters() {
-  fetch("/get_current_params")
-      .then(response => response.json())
-      .then(data => {
-          if(data.error) {
-              console.error("Failed to fetch current parameters:", data.error);
-          } else {
-              document.getElementById("current_batch_size").textContent = data.batch_size || "N/A";
-              document.getElementById("current_learning_rate").textContent = data.lr || "N/A";
-              document.getElementById("current_momentum").textContent = data.momentum || "N/A";
-              updateSliders(data)
-          }
-      })
-      .catch(error => {
-          console.error("Error:", error);
-      });
-}
-
-function updateSliders(data){
-  document.getElementById("batch_size_slider").value = data.batch_size
-  document.getElementById("batch_size_value").textContent = data.batch_size
-  document.getElementById("learning_rate_slider").value = data.lr
-  document.getElementById("learning_rate_value").textContent = data.lr
-  document.getElementById("momentum_slider").value = data.momentum
-  document.getElementById("momentum_value").textContent = data.momentum
-}
-*/
-//------------------------------------------------
 
 function saveModel(){
   fetch("/saveModel")
