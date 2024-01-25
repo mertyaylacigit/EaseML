@@ -5,7 +5,7 @@ import numpy as np
 import queue, json, pickle, os, sys
 import torch, flask
 
-from src.ml.models.model import ConvolutionalNeuralNetwork
+from src.ml.models.model import ConvolutionalNeuralNetwork, SimpleCNN, AdvancedCNN # Add new models here
 from src.ml.trainers.training import training
 
 from threading import Thread
@@ -168,7 +168,23 @@ def clearConfigurationHistory():
 
 
 
+##---------- model selection
 
+@bp.route("/set_model", methods=['POST'])
+def set_model():
+    global model
+    model_name = request.json.get('model_name', 'ConvolutionalNeuralNetwork')
+    
+    if model_name == 'ConvolutionalNeuralNetwork':
+        model = ConvolutionalNeuralNetwork()
+    elif model_name == 'SimpleCNN':
+        model = SimpleCNN()
+    elif model_name == 'AdvancedCNN':
+        model = AdvancedCNN()
+    else:
+        return jsonify({"success": False, "error": "Unknown model name"})
+    
+    return jsonify({"success": True})
 
 
 

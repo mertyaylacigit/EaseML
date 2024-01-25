@@ -29,6 +29,30 @@ let verLines = []
 var receviedData = false  //lazy Solution but it works
 
 
+// Model selection
+const model_selection = document.getElementById("model_selection");
+
+model_selection.addEventListener("change", function() {
+    const selectedModel = model_selection.value;
+    fetch('/set_model', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({model_name: selectedModel}),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Model set to:", selectedModel);
+        // You can add additional logic here if needed
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+
+//--------
+
 function start_training(){
   fetch("/start_training")
     .then(response => {
