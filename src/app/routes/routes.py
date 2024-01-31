@@ -4,6 +4,7 @@ from torch.optim import Optimizer, SGD
 import numpy as np
 import queue, json, pickle, os, sys
 import torch, flask
+import copy
 
 from src.ml.models.model import ConvolutionalNeuralNetwork
 from src.ml.trainers.training import training
@@ -20,11 +21,15 @@ q = queue.Queue()
 stop_training_flag = {"stop": False} # Use a dictionary with a mutable flag so when flag flips from False to True the function call training
                                      # receives the change because the function call takes the address of mutable objects rather than a copy 
                                      # of immutable objects like stop = False, so stop = {"stop": False} is better/necessary
+kill_flag = {"alive": True}
 
 manual_seed(seed)
 np.random.seed(seed)
-model = ConvolutionalNeuralNetwork()
+model = {}
+current_model_training = 0
 current_model = 0
+list_of_Training_Threads = []
+lazyFlag = False
 
 
 def listener():
@@ -46,12 +51,19 @@ def render_playground():
 
 @bp.route("/start_training")
 def start_training():
-  global stop_training_flag, model, current_model
+  global stop_training_flag, model, current_model, training, lazyFlag, kill_flag
 
+  model[0] = ConvolutionalNeuralNetwork()  
+  lazyFlag = True
 
   # start training process in seperate thread! 
-  training_thread = Thread(target=training, args=(model, False, 10, stop_training_flag, q))
+  training_thread = Thread(target=training, args=(model[0], False, 10, stop_training_flag,kill_flag, q))
   training_thread.start()
+
+
+  list_of_Training_Threads.append(training_thread)
+
+  print(training_thread)  
 
   return jsonify({"success": True})
 
@@ -71,8 +83,53 @@ def continue_training():
 
   return jsonify(stop_training_flag)
 
+@bp.route("/reset_training")
+def reset_training():
+    global list_of_Training_Threads, kill_flag, lazyFlag, model, current_model, current_model_training, stop_training_flag
+    kill_flag["alive"] = False
+    
+    for i in list_of_Training_Threads:
+        print(i.is_alive(),"1111")
+        i.join()
+        print(i.is_alive(),"2222")
+
+    list_of_Training_Threads = []
+
+    model = {}
+    current_model_training = 0
+    current_model = 0
+    list_of_Training_Threads = []
+    lazyFlag = False
+    kill_flag["alive"] = True
+    stop_training_flag["stop"] = False
+
+    print(list_of_Training_Threads)
+
+
+
+    return jsonify({"success": True})
+
+
 @bp.route("/update_params", methods=['POST'])
 def update_params():
+
+    global current_model_training, lazyFlag, kill_flag
+    
+    # copy current modell
+
+    if (lazyFlag):
+        new_model = copy.deepcopy(model[current_model_training])
+        current_model_training += 1
+
+        model[current_model_training] = new_model
+
+        new_Thread = Thread(target=training, args=(model[current_model_training], False, 10, stop_training_flag, kill_flag, q))
+        new_Thread.start()
+
+        list_of_Training_Threads.append(new_Thread)
+
+        print(list_of_Training_Threads)
+
     data = request.json
     try:
         config_path = 'config/training_config.json'

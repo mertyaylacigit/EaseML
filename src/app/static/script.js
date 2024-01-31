@@ -1,6 +1,7 @@
 const start_btn = document.getElementById("start_training")
 const stop_btn = document.getElementById("stop_training")
 const continue_btn = document.getElementById("continue_training")
+const reset_btn = document.getElementById("reset_training")
 const accuracy_span = document.getElementById("accuracy")
 const ac_chart = document.getElementById("accuracyChart")
 const l_chart = document.getElementById("lossChart")
@@ -19,6 +20,7 @@ const loss_function_dropdown = document.getElementById("loss_function");
 // deactivate stop and continue button
 stop_btn.disabled = true
 continue_btn.disabled = true
+reset_btn.disabled = true
 
 //global Parameters
 var last_batch = 0
@@ -49,6 +51,7 @@ function start_training(){
       neuralNetworkAnimation.classList.add('is-training');
       start_btn.disabled = true;
       stop_btn.disabled = false;
+      reset_btn.disabled = true;
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
       momentum_slider.disabled = true;
@@ -77,6 +80,7 @@ function stop_training(){
       neuralNetworkAnimation.classList.remove('is-training');
       stop_btn.disabled = true;
       continue_btn.disabled = false;
+      reset_btn.disabled = false;
       batch_size_slider.disabled = false;
       learning_rate_slider.disabled = false;
       momentum_slider.disabled = false;
@@ -105,6 +109,7 @@ function continue_training(){
       neuralNetworkAnimation.classList.add('is-training');
       continue_btn.disabled = true;
       stop_btn.disabled = false;
+      reset_btn.disabled = true;
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
       momentum_slider.disabled = true;
@@ -115,6 +120,102 @@ function continue_training(){
       toggleHistoryUI(false);
       updateCurrentParameters();
     })  
+}
+
+function reset_training(){
+  fetch("/reset_training")
+    .then(response => {
+      if (!response.ok){
+      console.log("Failed to continue training");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    })
+    .finally(()=> {
+      reset_btn.disabled = true;
+      start_btn.disabled = false
+      stop_btn.disabled = true
+      continue_btn.disabled = true
+      batch_size_slider.disabled = false;
+      learning_rate_slider.disabled = false;
+      momentum_slider.disabled = false;
+      loss_function_dropdown.disabled = false;
+      update_params_btn.disabled = false;
+      cleanupCharts()
+    }) 
+}
+
+function cleanupCharts(){
+  verLines = [];
+  accChart.data = {
+    labels: [],
+    datasets: [{
+      label: 'Accuracy',
+      borderColor: 'rgb(75, 192, 192)',
+      data: [],
+      fill: false
+    }]
+  };
+
+
+  lossChart.data = {
+    labels: [],
+    datasets: [{
+      label: 'Loss',
+      borderColor: 'rgb(75, 192, 192)',
+      data: [],
+      fill: false
+    }]
+  };
+
+  accChart.options =  {
+    responsive: true,
+    scales: {
+      x: {
+        type: 'linear',
+        position: 'bottom'
+        },
+      y: {
+        type: 'linear',
+        position: 'left'
+        }
+      },
+      plugins: {
+        annotation: {
+          annotations: verLines
+        }
+      }
+    };
+
+    lossChart.options =  {
+      responsive: true,
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'bottom'
+          },
+        y: {
+          type: 'linear',
+          position: 'left'
+          }
+        },
+        plugins: {
+          annotation: {
+            annotations: verLines
+          }
+        }
+      };
+
+
+  receviedData = false;
+  last_batch = 0;
+  refDataset = 0;
+
+  accChart.update();
+  lossChart.update();
+  
+
 }
 
 
@@ -370,6 +471,7 @@ function getRandomColor() {
 start_btn.addEventListener("click", start_training)
 stop_btn.addEventListener("click", stop_training)
 continue_btn.addEventListener("click", continue_training)
+reset_btn.addEventListener("click", reset_training)
 
 batch_size_slider.oninput = function() {
   //console.log("Batch size slider value: " + this.value); // Debugging log

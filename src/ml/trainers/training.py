@@ -67,12 +67,14 @@ def get_loss_function(name): # The boolean indicates wether we need to apply the
         raise ValueError(f"Unknown loss function: {name}")
 
 
-def training(model: Module, cuda: bool, n_epochs: int, stop: dict, queue: Queue = None):
+def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, queue: Queue = None):
     config_path = 'config/training_config.json'
     optimizer_params, batch_size, loss_function_name = check_for_initial_params(config_path)
     loss_function, apply_log_softmax = get_loss_function(loss_function_name)
 
-    while True:
+    torch.autograd.set_detect_anomaly(True)
+
+    while kill['alive']:
         if not stop['stop']:  # If not stopped, start/resume training
             train_loader, test_loader = get_data_loaders(batch_size=batch_size)
             if cuda:
@@ -100,8 +102,19 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, queue: Queue 
                             optimizer_params, batch_size, loss_function_name = check_for_updates(config_path)
                             optimizer = create_optimizer(model, optimizer_params)  # Update optimizer if necessary
                             loss_function, apply_log_softmax = get_loss_function(loss_function_name)
+                            
+                            if not kill["alive"]:
+                                return
         else:
             time.sleep(0.1)  # Sleep if training is stopped
+
+
+
+def copyModel(model):
+
+    new_model = model
+    new_model.load_state_dict(model.state_dict())
+
 
 
 def main(seed):
@@ -110,6 +123,7 @@ def main(seed):
     np.random.seed(seed)
     model = ConvolutionalNeuralNetwork()
     print("train...")
+
     training(
         model=model,
         cuda=False,     # change to True to run on nvidia gpu
