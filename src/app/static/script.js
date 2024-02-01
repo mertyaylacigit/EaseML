@@ -407,6 +407,10 @@ update_params_btn.addEventListener("click", function() {
   updateTrainingParams(newParams);
 });
 
+document.querySelector('.close-btn').addEventListener('click', function() {
+  document.querySelector('.introduction-section').style.display = 'none';
+});
+
 
 setInterval(update_accuracy,1000)
 
