@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../static/script.js" defer ></script>
     <script src="../static/history_script.js" defer ></script>
+    <script src="../static/playground.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
 <body>
@@ -15,9 +16,10 @@
     <nav class="navbar">
         <div class="left">
             <a href="/" class="easeML">easeML</a>
+            <!--
             <ul>
                 <li class="playground-button"><a href="/playground">Playground<span class="new-tag">New!</span></a></li>
-            </ul>
+            </ul> -->
         </div>
         <div class="right">
             <div class="hamburger-menu">
@@ -26,6 +28,13 @@
         </div>
         
     </nav>
+
+    <!-- Introduction Section -->
+    <div class="introduction-section">
+        <span class="close-btn">&times;</span> <!-- Close button -->
+        <h2>Welcome to easeML</h2>
+        <p>This platform allows you to explore and interact with machine learning models in a user-friendly environment. Here, you can train models, make predictions, and see how different parameters affect the outcomes. The models are using the MNIST-dataset for training, which is a collection of hand-drawn digits, widely used for training and testing in the field of machine learning. Dive into the playground to test your MNIST digit recognition model, experiment with configurations, and learn more about the world of machine learning.</p>
+    </div>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -235,6 +244,36 @@
             <p>Batch Size: <span id="current_batch_size">N/A</span></p>
             <p>Learning Rate: <span id="current_learning_rate">N/A</span></p>
             <p>Momentum: <span id="current_momentum">N/A</span></p>
+        </div>
+    </div>
+
+    <!-- Playground Section -->
+    <div id="playground-section" class="playground">
+        <h3>Playground</h3>
+        <div class="playground-content">
+            <!-- Left: MNIST Dataset Explanation -->
+            <div class="mnist-explanation">
+                <h4>Try your model with your own digits!</h4>
+                <p>The MNIST dataset is a collection of hand-drawn digits, widely used for training and testing in the field of machine learning. In this playground, you have the opportunity to test your trained model. Simply draw a digit in the canvas and click 'Predict' to see how well your model recognizes hand-drawn digits.</p>
+            </div>
+
+            <!-- Center: Drawing Canvas and Control Buttons -->
+            <div class="playground-canvas-and-controls">
+                <canvas id="drawingCanvas" width="280" height="280"></canvas>
+                <div class="canvas-buttons">
+                    <button id="clearButton" class="button">Clear</button>
+                    <button id="predict" class="button">Predict</button>
+                </div>
+                <canvas hidden id="compressedCanvas" width="28" height="28"></canvas>
+            </div>
+
+            <!-- Right: Prediction Result and Probability -->
+            <div class="playground-results">
+                <div class="prediction-result">
+                    <div id="predicted_digit">Prediction: <span id="predicted_digit_inner"></span></div>
+                    <div id="probability_div">Probability: <span id="probability"></span></div>
+                </div>
+            </div>
         </div>
     </div>
 

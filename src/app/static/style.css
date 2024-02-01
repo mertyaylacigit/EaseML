@@ -373,3 +373,125 @@ nav ul li a {
 .show {
   display: block;
 }
+
+
+
+
+/* Introduction Section Styling for Consistency with Other Sections */
+.introduction-section {
+  position: relative; /* To position the close button correctly */
+  background-color: white;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid whitesmoke;
+}
+
+.introduction-section h2 {
+  color: #333; /* Keeping the theme color for headings */
+  margin-bottom: 15px;
+}
+
+.introduction-section p {
+  color: #333; /* Ensures text is readable against the white background */
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+
+
+
+
+/* Playground Section Styling */
+.playground {
+  margin: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border: 2px solid whitesmoke; /* Consistent with other sections */
+}
+
+.playground h3 {
+  margin-left: 10px; /* Adjust this value as needed to align with the playground explanation */
+  padding-left: 20px; /* Or use padding if that suits the alignment better */
+}
+
+.playground-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Playground Section Inner Content Styling */
+.mnist-explanation, .playground-canvas-and-controls, .playground-results {
+  flex-basis: 30%;
+  text-align: center;
+  padding: 10px 20px; /* Increased horizontal padding */
+}
+
+.mnist-explanation {
+  text-align: left; /* Align text to the left */
+}
+
+#drawingCanvas {
+  border: 2px solid #ddd;
+  background-color: #f7faff;
+}
+
+.canvas-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+
+.playground-results {
+  border: 2px solid whitesmoke;
+  padding: 20px;
+  margin: 10px 0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: inset 0 0 10px #ccc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* Center align the content */
+  width: 100px; /* Adjust width as needed */
+}
+
+.prediction-result {
+  font-size: 20px; /* Adjust size as desired */
+  font-weight: bold;
+  color: #333; /* Theme color or choose what fits best */
+}
+
+#predicted_digit, #probability_div {
+  margin: 10px 0; /* Space around each for clarity */
+}
+
+/* Button styles */
+.button {
+  background-color: #f7faff; /* Light blue background */
+  color: #0056b3; /* Blue font color */
+  border: 2px solid #007bff; /* Blue border */
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.button:hover {
+  background-color: #dce4f7; /* Slightly darker on hover */
+}
