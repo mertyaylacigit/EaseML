@@ -25,11 +25,16 @@ reset_btn.disabled = true
 //global Parameters
 var last_batch = 0
 var refDataset = 0
+var refDatasetBranch = -1
+var lastAccOg = -1
+var lastLossOg = -1
 var lastAcc = -1
 var lastLoss = -1
 let verLines = []
 var receviedData = false  //lazy Solution but it works
-
+var knownIDs = [-1]
+var chart1Data = false
+var chart2Data = true //more flags to track wheter information has been recieved (not pretty but niether am i)
 
 function start_training(){
   fetch("/start_training")
@@ -211,6 +216,7 @@ function cleanupCharts(){
   receviedData = false;
   last_batch = 0;
   refDataset = 0;
+  refDatasetBranch = -1;
 
   accChart.update();
   lossChart.update();
@@ -218,44 +224,99 @@ function cleanupCharts(){
 
 }
 
+function addNewDatasets(){
+
+  addVerticalLine(last_batch - 1);
+  addNewDataset(lossChart);
+  addNewDataset(accChart);
+  lossChart.update();
+  accChart.update();
+}
+
 
 function addNewDataset(chart) {
-  var label = 'New Parameters ' + refDataset;
+  var label = 'Old Parameter' + refDataset/2;
   var color = getRandomColor()
 
+  console.log(refDataset)
   var existingPoint = {
-    x:last_batch ,
-    y:chart.data.datasets[refDataset - 1].data[chart.data.datasets[refDataset - 1 ].data.length -1].y
+    x:last_batch -1,
+    y:chart.data.datasets[refDataset - 2].data[chart.data.datasets[refDataset - 2 ].data.length - 1].y
   };
 
   console.log(existingPoint)
   var newDataset = {
+    label: "Current Model",
+    borderColor: 'rgb(75, 192, 192)',
+    data: [existingPoint],
+    fill: false,
+  };
+
+  var newDatasetbranch = {
     label: label,
     borderColor: color,
     data: [existingPoint],
     fill: false,
   };
 
-  addVerticalLine(last_batch);
+  chart.data.datasets.push(newDatasetbranch);
   chart.data.datasets.push(newDataset);
-  chart.update();
 }
 
 
-function updateCharts(data){
+function proccesData(data){
+  if(data.id != -1 && !(knownIDs.includes(data.id))){
+    if (knownIDs.length == 3){
+      knownIDs.pop();
+      lastAcc = -1;
+      lastAcc = -1;
+    }
+    knownIDs.push(data.id);
+  }
 
-  // Checks if point is "new"
-  if(lastAcc != data.acc || lastLoss != data.loss){
-    last_batch = last_batch +1;
-    updateChart(data.acc, accChart);
-    updateChart(data.loss, lossChart);
-    lastAcc = data.acc;
-    lastLoss = data.loss;
-    receviedData = true
+  console.log(knownIDs)
+
+
+      // Checks if point is "new" og Model
+  if (data.id == knownIDs[1]){
+    if(lastAccOg != data.acc || lastLossOg != data.loss){
+      updateChart(data.acc, accChart, true);
+      updateChart(data.loss, lossChart, true);
+      lastAccOg = data.acc;
+      lastLossOg = data.loss;
+      receviedData = true;
+      chart1Data = true;
+    }
+  }
+
+      // Checks if point is "new" new Model
+  else if (data.id == knownIDs[2]){
+    if(lastAcc != data.acc || lastLoss != data.loss){
+      updateChart(data.acc, accChart, false);
+      updateChart(data.loss, lossChart, false);
+      lastAcc = data.acc;
+      lastLoss = data.loss;
+      chart2Data = true;
+    }
+  }
+  
+
+  console.log(chart1Data);
+  console.log(chart2Data);
+
+  if (chart1Data && chart2Data){
+    console.log("update")
+    last_batch += 1;
+    accChart.update();
+    lossChart.update()
+    chart1Data = false;
+    if (knownIDs.length == 3){
+      chart2Data = false;
+    }
   }
 }
 
-function updateChart(dataPoint, chart) {
+function updateChart(dataPoint, chart, original) {
   // format Data
     var point = {
       x: last_batch,
@@ -264,10 +325,14 @@ function updateChart(dataPoint, chart) {
 
   // Add a new data point to the chart
   //console.log(last_batch)
-  chart.data.labels.push(last_batch)
-  chart.data.datasets[refDataset].data.push(point)
-  chart.update()
-    
+  if (original){
+    chart.data.labels.push(last_batch)
+    chart.data.datasets[refDataset].data.push(point)
+  }
+  else {
+    chart.data.labels.push(last_batch)
+    chart.data.datasets[refDatasetBranch].data.push(point)
+  }
 }
 
 function addVerticalLine(value) {
@@ -296,8 +361,12 @@ function update_accuracy(){
       }
     })
     .then(data => {
-      //console.log("Recieved Data:", data)
-      updateCharts(data);
+      console.log("Recieved Data:", data)
+      console.log(data.dict1);
+      proccesData(data.dict1);
+      if(data.dict2.acc != -1){
+        proccesData(data.dict2);  
+      }
       accuracy_span.textContent = data.acc
     })
 }
@@ -422,7 +491,7 @@ lossChart = new Chart(l_chart, {
     labels: [],
     datasets: [{
       label: 'Loss',
-      borderColor: getRandomColor(),
+      borderColor:'rgb(75, 192, 192)',
       data: [],
       fill: false
     }]
@@ -502,15 +571,15 @@ update_params_btn.addEventListener("click", function() {
   };
   if (receviedData)
   {
-    refDataset = refDataset + 1;
-    addNewDataset(lossChart);
-    addNewDataset(accChart);
+    refDataset = refDataset + 2;
+    refDatasetBranch = refDatasetBranch + 2;
+    addNewDatasets();
   }
   updateTrainingParams(newParams);
 });
 
 
-setInterval(update_accuracy,1000)
+setInterval(update_accuracy,1000);
 
 
 
