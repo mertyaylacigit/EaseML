@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, jsonify, request, send_file
 from torch import manual_seed, Tensor
 from torch.optim import Optimizer, SGD
 import numpy as np
-import queue, json, pickle, os, sys
+import queue, json, pickle, os, sys, re
 import torch, flask
 import copy
 
@@ -161,16 +161,27 @@ def update_params():
     data = request.json
     try:
         config_path = 'config/training_config.json'
-        with open(config_path, 'r') as file:
-            current_config = json.load(file)
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as file:
+                current_config = json.load(file)
 
-        # Update the config with new values
-        current_config.update(data)
+            # Update the config with new values
+            current_config.update(data)
+            # Update the config with new values
+            current_config.update(data)
 
-        with open(config_path, 'w') as file:
-            json.dump(current_config, file)
+            with open(config_path, 'w') as file:
+                json.dump(current_config, file)
+            with open(config_path, 'w') as file:
+                json.dump(current_config, file)
 
-        return jsonify({"success": True})
+            return jsonify({"success": True})
+        else:
+            with open(config_path, 'w') as file:
+                json.dump(data, file)
+
+            return jsonify({"success": True})
+
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
     
@@ -326,6 +337,18 @@ def downloadModel():
 
     return send_file(os.getcwd() + "/" + model_path, as_attachment=True)
 
+@bp.route("/deleteAfterDownloadModel")
+def deleteAfterDownloadModel():
+    model_id = int(request.args.get("model_id"))
+    model_path = "config/model" + str(model_id) + ".pickle"
+
+    try:
+        os.remove(model_path)
+        print(f"Deleted file: {model_path}")
+    except OSError as e:
+        print(f"Error deleting file: {model_path} - {e}")
+
+    return jsonify({"success": True})
 
 
 
@@ -343,6 +366,7 @@ def downloadModel():
 
 @bp.route("/predict", methods=['POST'])
 def predict():
+    global selected_model
 
     batch_size = 1
     channels = 1  # Grayscale image
@@ -359,22 +383,49 @@ def predict():
 
 
     try:
-        config_path = 'config/model_pretrained.pickle'
-        with open(config_path, 'rb') as file:
-            model = pickle.load(file)
-            model.eval()
-            with torch.no_grad():
-                prediction_array = model(X)
-                prediction_array = prediction_array.numpy()
-                prediction_array_softmax = np.exp(prediction_array) / np.sum(np.exp(prediction_array))
-                print(prediction_array_softmax)
-                prediction = {"label": int(np.argmax(prediction_array_softmax)),
-                              "probability": round(float(np.max(prediction_array_softmax)), 2)}
-            print(prediction)
+        selected_model.eval()
+        with torch.no_grad():
+            prediction_array = selected_model(X)
+            prediction_array = prediction_array.numpy()
+            prediction_array_softmax = np.exp(prediction_array) / np.sum(np.exp(prediction_array))
+            print(prediction_array_softmax)
+            prediction = {"label": int(np.argmax(prediction_array_softmax)),
+                          "probability": round(float(np.max(prediction_array_softmax)), 2)}
+        print(prediction)
         return jsonify(prediction)
     except Exception as e:
         print("hää")
         return jsonify({"error": str(e)})
     
+
+@bp.route("/change_selected_model", methods=['POST'])
+def change_selected_model():
+    global selected_model, model
+
+    data = request.json
+
+    if (data == "current_model"):
+        selected_model = model
+        return jsonify({"success": True})
+    if (data == "model_pretrained"):
+        config_path = 'config/model_pretrained.pickle'
+        with open(config_path, 'rb') as file:
+            model_file = pickle.load(file)
+            selected_model = model_file
+            return jsonify({"success": True})
+    else:
+        
+        model_history_path = 'config/model_history.pickle'  # Update the path to your model history file
+        try:
+            with open(model_history_path, 'rb') as file:
+                model_history = pickle.load(file)
+
+                model_index = int(re.search("[0-9]+", data).group())
+                selected_model = model_history[model_index]
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+        
+        return jsonify({"success": True})
+
 
 
