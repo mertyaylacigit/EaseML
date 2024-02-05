@@ -293,6 +293,8 @@ function downloadModel(model_id){
     // Clean up
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+
+    fetch(`/deleteAfterDownloadModel?model_id=${encodeURIComponent(model_id_num)}`)
   })
   .catch(error => {
       console.error('Error:', error);

@@ -247,6 +247,18 @@ def downloadModel():
 
     return send_file(os.getcwd() + "/" + model_path, as_attachment=True)
 
+@bp.route("/deleteAfterDownloadModel")
+def deleteAfterDownloadModel():
+    model_id = int(request.args.get("model_id"))
+    model_path = "config/model" + str(model_id) + ".pickle"
+
+    try:
+        os.remove(model_path)
+        print(f"Deleted file: {model_path}")
+    except OSError as e:
+        print(f"Error deleting file: {model_path} - {e}")
+
+    return jsonify({"success": True})
 
 
 
