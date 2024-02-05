@@ -226,6 +226,7 @@ function cleanupCharts(){
 
 function addNewDatasets(){
 
+  chart2Data = false
   addVerticalLine(last_batch - 1);
   addNewDataset(lossChart);
   addNewDataset(accChart);
@@ -267,6 +268,7 @@ function addNewDataset(chart) {
 function proccesData(data){
   if(data.id != -1 && !(knownIDs.includes(data.id))){
     if (knownIDs.length == 3){
+      chart2Data = false;
       knownIDs.pop();
       lastAcc = -1;
       lastAcc = -1;
@@ -279,7 +281,7 @@ function proccesData(data){
 
       // Checks if point is "new" og Model
   if (data.id == knownIDs[1]){
-    if(lastAccOg != data.acc || lastLossOg != data.loss){
+    if((lastAccOg != data.acc || lastLossOg != data.loss) && !chart1Data){
       updateChart(data.acc, accChart, true);
       updateChart(data.loss, lossChart, true);
       lastAccOg = data.acc;
@@ -291,7 +293,7 @@ function proccesData(data){
 
       // Checks if point is "new" new Model
   else if (data.id == knownIDs[2]){
-    if(lastAcc != data.acc || lastLoss != data.loss){
+    if((lastAcc != data.acc || lastLoss != data.loss) && !chart2Data){
       updateChart(data.acc, accChart, false);
       updateChart(data.loss, lossChart, false);
       lastAcc = data.acc;
@@ -305,6 +307,7 @@ function proccesData(data){
   console.log(chart2Data);
 
   if (chart1Data && chart2Data){
+    console.log(last_batch)
     console.log("update")
     last_batch += 1;
     accChart.update();

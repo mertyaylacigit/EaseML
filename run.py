@@ -1,6 +1,7 @@
 import threading
 import webbrowser
 import time
+import torch
 
 from src.app import create_app
 from src.app.routes.routes import listener1, listener2
