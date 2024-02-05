@@ -33,6 +33,8 @@ kill_flag = {"alive": True}
 manual_seed(seed)
 np.random.seed(seed)
 model = {}
+model[0] = ConvolutionalNeuralNetwork()  
+selected_model = model[0]
 thread0 = 0
 thread1 = 0
 current_model_training = 0
@@ -75,7 +77,6 @@ def render_playground():
 def start_training():
   global stop_training_flag, model, current_model, training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, listeners, thread0
 
-  model[0] = ConvolutionalNeuralNetwork()  
   lazyFlag = True
 
   # start training process in seperate thread! 
@@ -282,9 +283,9 @@ def clearConfigurationHistory():
 
 @bp.route("/saveModel")
 def saveModel():
-    global model
+    global model, current_model_training
 
-    current_model = model
+    current_model = model[current_model_training]
 
     model_history_path = 'config/model_history.pickle'  # Update the path to your model history file
     try:
@@ -405,7 +406,7 @@ def change_selected_model():
     data = request.json
 
     if (data == "current_model"):
-        selected_model = model
+        selected_model = model[current_model_training]
         return jsonify({"success": True})
     if (data == "model_pretrained"):
         config_path = 'config/model_pretrained.pickle'
