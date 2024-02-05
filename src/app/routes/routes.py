@@ -76,16 +76,23 @@ def update_params():
     data = request.json
     try:
         config_path = 'config/training_config.json'
-        with open(config_path, 'r') as file:
-            current_config = json.load(file)
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as file:
+                current_config = json.load(file)
 
-        # Update the config with new values
-        current_config.update(data)
+            # Update the config with new values
+            current_config.update(data)
 
-        with open(config_path, 'w') as file:
-            json.dump(current_config, file)
+            with open(config_path, 'w') as file:
+                json.dump(current_config, file)
 
-        return jsonify({"success": True})
+            return jsonify({"success": True})
+        else:
+            with open(config_path, 'w') as file:
+                json.dump(data, file)
+
+            return jsonify({"success": True})
+
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
     
