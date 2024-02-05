@@ -361,6 +361,25 @@ function getRandomColor() {
   return color;
 }
 
+function updateSelectedModel(model) {
+  console.log(model);
+  fetch("/change_selected_model", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(model),
+  })
+    .then(response => {
+      if (!response.ok){
+        console.log("Failed to start training");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    })
+}
+
 
 
 
