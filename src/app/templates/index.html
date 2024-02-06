@@ -128,6 +128,8 @@
                     <button id="continue_training"><span class="material-symbols-outlined">
                         resume
                         </span></button>
+                    <br>
+                    <button id="reset_training">Reset Training</button>
                 </div>
 
                 <!-- Neural Network Animation -->
@@ -296,6 +298,10 @@
                 <div class="canvas-buttons">
                     <button id="clearButton" class="button">Clear</button>
                     <button id="predict" class="button">Predict</button>
+                    <select id="model_selection" onchange="updateSelectedModel(this.value)">
+                        <option value="current_model">Current Model</option>
+                        <option value="model_pretrained">Pretrained Model</option>
+                    </select>
                 </div>
                 <canvas hidden id="compressedCanvas" width="28" height="28"></canvas>
             </div>

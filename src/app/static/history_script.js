@@ -205,6 +205,8 @@ const clear_model_history_btn = document.getElementById("clear_model_history")
 const download_model_btn = document.getElementById("download_model")
 const modelList_div = document.getElementById("modelList")
 
+const model_selection_select = document.getElementById("model_selection")
+
 remove_model_btn.disabled = true;
 clear_model_history_btn.disabled = true;
 download_model_btn.disabled = true;
@@ -244,6 +246,12 @@ function createModelItem(data){
   })
 
   modelList_div.appendChild(newModel)
+
+  //create model option in model selector
+  option = document.createElement("option");
+  option.text = "model-" + data.model_id
+  option.value = "model-" + data.model_id
+  model_selection_select.add(option)
 }
 
 function removeModel(model_id){
@@ -251,6 +259,7 @@ function removeModel(model_id){
   save_model_btn.disabled = false
   clear_model_history_btn.disabled = false
   modelList_div.querySelector(`#${model_id}`).remove()
+  model_selection_select.querySelector(`[value="${model_id}"]`).remove()
   if(modelList_div.querySelectorAll("button").length == 0){
     modelList_div.getElementsByTagName("p")[0].style.display = "block"
     clear_model_history_btn.disabled = true
@@ -265,6 +274,14 @@ function clearModelHistory(){
   }
   modelList_div.getElementsByTagName("p")[0].style.display = "block"
   clear_model_history_btn.disabled = true
+
+  // clear models in model selection
+  options = model_selection_select.querySelectorAll("option");
+  for (o of options){
+    if ((o.value != "current_model") && (o.value != "model_pretrained")) {
+      model_selection_select.removeChild(o);
+    }
+  }
 }
 
 function downloadModel(model_id){
@@ -293,6 +310,8 @@ function downloadModel(model_id){
     // Clean up
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+
+    fetch(`/deleteAfterDownloadModel?model_id=${encodeURIComponent(model_id_num)}`)
   })
   .catch(error => {
       console.error('Error:', error);

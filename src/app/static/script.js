@@ -1,6 +1,7 @@
 const start_btn = document.getElementById("start_training")
 const stop_btn = document.getElementById("stop_training")
 const continue_btn = document.getElementById("continue_training")
+const reset_btn = document.getElementById("reset_training")
 const accuracy_span = document.getElementById("accuracy")
 const ac_chart = document.getElementById("accuracyChart")
 const l_chart = document.getElementById("lossChart")
@@ -19,15 +20,21 @@ const loss_function_dropdown = document.getElementById("loss_function");
 // deactivate stop and continue button
 stop_btn.disabled = true
 continue_btn.disabled = true
+reset_btn.disabled = true
 
 //global Parameters
 var last_batch = 0
 var refDataset = 0
+var refDatasetBranch = -1
+var lastAccOg = -1
+var lastLossOg = -1
 var lastAcc = -1
 var lastLoss = -1
 let verLines = []
 var receviedData = false  //lazy Solution but it works
-
+var knownIDs = [-1]
+var chart1Data = false
+var chart2Data = true //more flags to track wheter information has been recieved (not pretty but niether am i)
 
 function start_training(){
   fetch("/start_training")
@@ -49,6 +56,7 @@ function start_training(){
       neuralNetworkAnimation.classList.add('is-training');
       start_btn.disabled = true;
       stop_btn.disabled = false;
+      reset_btn.disabled = true;
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
       momentum_slider.disabled = true;
@@ -77,6 +85,7 @@ function stop_training(){
       neuralNetworkAnimation.classList.remove('is-training');
       stop_btn.disabled = true;
       continue_btn.disabled = false;
+      reset_btn.disabled = false;
       batch_size_slider.disabled = false;
       learning_rate_slider.disabled = false;
       momentum_slider.disabled = false;
@@ -105,6 +114,7 @@ function continue_training(){
       neuralNetworkAnimation.classList.add('is-training');
       continue_btn.disabled = true;
       stop_btn.disabled = false;
+      reset_btn.disabled = true;
       batch_size_slider.disabled = true;
       learning_rate_slider.disabled = true;
       momentum_slider.disabled = true;
@@ -117,44 +127,199 @@ function continue_training(){
     })  
 }
 
+function reset_training(){
+  fetch("/reset_training")
+    .then(response => {
+      if (!response.ok){
+      console.log("Failed to continue training");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    })
+    .finally(()=> {
+      reset_btn.disabled = true;
+      start_btn.disabled = false
+      stop_btn.disabled = true
+      continue_btn.disabled = true
+      batch_size_slider.disabled = false;
+      learning_rate_slider.disabled = false;
+      momentum_slider.disabled = false;
+      loss_function_dropdown.disabled = false;
+      update_params_btn.disabled = false;
+      cleanupCharts()
+    }) 
+}
+
+function cleanupCharts(){
+  verLines = [];
+  accChart.data = {
+    labels: [],
+    datasets: [{
+      label: 'Accuracy',
+      borderColor: 'rgb(75, 192, 192)',
+      data: [],
+      fill: false
+    }]
+  };
+
+
+  lossChart.data = {
+    labels: [],
+    datasets: [{
+      label: 'Loss',
+      borderColor: 'rgb(75, 192, 192)',
+      data: [],
+      fill: false
+    }]
+  };
+
+  accChart.options =  {
+    responsive: true,
+    scales: {
+      x: {
+        type: 'linear',
+        position: 'bottom'
+        },
+      y: {
+        type: 'linear',
+        position: 'left'
+        }
+      },
+      plugins: {
+        annotation: {
+          annotations: verLines
+        }
+      }
+    };
+
+    lossChart.options =  {
+      responsive: true,
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'bottom'
+          },
+        y: {
+          type: 'linear',
+          position: 'left'
+          }
+        },
+        plugins: {
+          annotation: {
+            annotations: verLines
+          }
+        }
+      };
+
+
+  receviedData = false;
+  last_batch = 0;
+  refDataset = 0;
+  refDatasetBranch = -1;
+
+  accChart.update();
+  lossChart.update();
+  
+
+}
+
+function addNewDatasets(){
+
+  chart2Data = false
+  addVerticalLine(last_batch - 1);
+  addNewDataset(lossChart);
+  addNewDataset(accChart);
+  lossChart.update();
+  accChart.update();
+}
+
 
 function addNewDataset(chart) {
-  var label = 'New Parameters ' + refDataset;
+  var label = 'Old Parameter' + refDataset/2;
   var color = getRandomColor()
 
+  console.log(refDataset)
   var existingPoint = {
-    x:last_batch ,
-    y:chart.data.datasets[refDataset - 1].data[chart.data.datasets[refDataset - 1 ].data.length -1].y
+    x:last_batch -1,
+    y:chart.data.datasets[refDataset - 2].data[chart.data.datasets[refDataset - 2 ].data.length - 1].y
   };
 
   console.log(existingPoint)
   var newDataset = {
+    label: "Current Model",
+    borderColor: 'rgb(75, 192, 192)',
+    data: [existingPoint],
+    fill: false,
+  };
+
+  var newDatasetbranch = {
     label: label,
     borderColor: color,
     data: [existingPoint],
     fill: false,
   };
 
-  addVerticalLine(last_batch);
+  chart.data.datasets.push(newDatasetbranch);
   chart.data.datasets.push(newDataset);
-  chart.update();
 }
 
 
-function updateCharts(data){
+function proccesData(data){
+  if(data.id != -1 && !(knownIDs.includes(data.id))){
+    if (knownIDs.length == 3){
+      chart2Data = false;
+      knownIDs.pop();
+      lastAcc = -1;
+      lastAcc = -1;
+    }
+    knownIDs.push(data.id);
+  }
 
-  // Checks if point is "new"
-  if(lastAcc != data.acc || lastLoss != data.loss){
-    last_batch = last_batch +1;
-    updateChart(data.acc, accChart);
-    updateChart(data.loss, lossChart);
-    lastAcc = data.acc;
-    lastLoss = data.loss;
-    receviedData = true
+  console.log(knownIDs)
+
+
+      // Checks if point is "new" og Model
+  if (data.id == knownIDs[1]){
+    if((lastAccOg != data.acc || lastLossOg != data.loss) && !chart1Data){
+      updateChart(data.acc, accChart, true);
+      updateChart(data.loss, lossChart, true);
+      lastAccOg = data.acc;
+      lastLossOg = data.loss;
+      receviedData = true;
+      chart1Data = true;
+    }
+  }
+
+      // Checks if point is "new" new Model
+  else if (data.id == knownIDs[2]){
+    if((lastAcc != data.acc || lastLoss != data.loss) && !chart2Data){
+      updateChart(data.acc, accChart, false);
+      updateChart(data.loss, lossChart, false);
+      lastAcc = data.acc;
+      lastLoss = data.loss;
+      chart2Data = true;
+    }
+  }
+  
+
+  console.log(chart1Data);
+  console.log(chart2Data);
+
+  if (chart1Data && chart2Data){
+    console.log(last_batch)
+    console.log("update")
+    last_batch += 1;
+    accChart.update();
+    lossChart.update()
+    chart1Data = false;
+    if (knownIDs.length == 3){
+      chart2Data = false;
+    }
   }
 }
 
-function updateChart(dataPoint, chart) {
+function updateChart(dataPoint, chart, original) {
   // format Data
     var point = {
       x: last_batch,
@@ -163,10 +328,14 @@ function updateChart(dataPoint, chart) {
 
   // Add a new data point to the chart
   //console.log(last_batch)
-  chart.data.labels.push(last_batch)
-  chart.data.datasets[refDataset].data.push(point)
-  chart.update()
-    
+  if (original){
+    chart.data.labels.push(last_batch)
+    chart.data.datasets[refDataset].data.push(point)
+  }
+  else {
+    chart.data.labels.push(last_batch)
+    chart.data.datasets[refDatasetBranch].data.push(point)
+  }
 }
 
 function addVerticalLine(value) {
@@ -195,8 +364,12 @@ function update_accuracy(){
       }
     })
     .then(data => {
-      //console.log("Recieved Data:", data)
-      updateCharts(data);
+      console.log("Recieved Data:", data)
+      console.log(data.dict1);
+      proccesData(data.dict1);
+      if(data.dict2.acc != -1){
+        proccesData(data.dict2);  
+      }
       accuracy_span.textContent = data.acc
     })
 }
@@ -321,7 +494,7 @@ lossChart = new Chart(l_chart, {
     labels: [],
     datasets: [{
       label: 'Loss',
-      borderColor: getRandomColor(),
+      borderColor:'rgb(75, 192, 192)',
       data: [],
       fill: false
     }]
@@ -361,6 +534,25 @@ function getRandomColor() {
   return color;
 }
 
+function updateSelectedModel(model) {
+  console.log(model);
+  fetch("/change_selected_model", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(model),
+  })
+    .then(response => {
+      if (!response.ok){
+        console.log("Failed to start training");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    })
+}
+
 
 
 
@@ -370,6 +562,7 @@ function getRandomColor() {
 start_btn.addEventListener("click", start_training)
 stop_btn.addEventListener("click", stop_training)
 continue_btn.addEventListener("click", continue_training)
+reset_btn.addEventListener("click", reset_training)
 
 batch_size_slider.oninput = function() {
   //console.log("Batch size slider value: " + this.value); // Debugging log
@@ -400,9 +593,9 @@ update_params_btn.addEventListener("click", function() {
   };
   if (receviedData)
   {
-    refDataset = refDataset + 1;
-    addNewDataset(lossChart);
-    addNewDataset(accChart);
+    refDataset = refDataset + 2;
+    refDatasetBranch = refDatasetBranch + 2;
+    addNewDatasets();
   }
   updateTrainingParams(newParams);
 });
@@ -412,7 +605,7 @@ document.querySelector('.close-btn').addEventListener('click', function() {
 });
 
 
-setInterval(update_accuracy,1000)
+setInterval(update_accuracy,1000);
 
 
 
