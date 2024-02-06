@@ -7,6 +7,8 @@ const ac_chart = document.getElementById("accuracyChart")
 const l_chart = document.getElementById("lossChart")
 const configuration_history = document.getElementById("configuration-history")
 const model_history = document.getElementById("model-history")
+const follow_Branch_btn = document.getElementById("followBranch")
+const follow_Og_btn = document.getElementById("followOg")
 
 // dynamic parameters
 const batch_size_slider = document.getElementById("batch_size_slider")
@@ -21,6 +23,9 @@ const loss_function_dropdown = document.getElementById("loss_function");
 stop_btn.disabled = true
 continue_btn.disabled = true
 reset_btn.disabled = true
+follow_Branch_btn.disabled = true
+follow_Og_btn.disabled = true
+
 
 //global Parameters
 var last_batch = 0
@@ -35,6 +40,7 @@ var receviedData = false  //lazy Solution but it works
 var knownIDs = [-1]
 var chart1Data = false
 var chart2Data = true //more flags to track wheter information has been recieved (not pretty but niether am i)
+var followBranch = false
 
 function start_training(){
   fetch("/start_training")
@@ -91,6 +97,14 @@ function stop_training(){
       momentum_slider.disabled = false;
       loss_function_dropdown.disabled = false;
       update_params_btn.disabled = false;
+      if (knownIDs.length == 3){
+        if (followBranch){
+          follow_Og_btn.disabled = false;
+        } else {
+          follow_Branch_btn.disabled = false;
+        }
+      }
+
       toggleHistoryUI(true);
     })
 }
@@ -122,6 +136,8 @@ function continue_training(){
       update_params_btn.disabled = true;
       configuration_history.disabled = true;
       model_history.disabled = true;
+      follow_Branch_btn.disabled = true;
+      follow_Og_btn.disabled = true;
       toggleHistoryUI(false);
       updateCurrentParameters();
     })  
@@ -268,12 +284,18 @@ function addNewDataset(chart) {
 function proccesData(data){
   if(data.id != -1 && !(knownIDs.includes(data.id))){
     if (knownIDs.length == 3){
+      if (followBranch){
+        chart1Data = false;
+
+      }
       chart2Data = false;
       knownIDs.pop();
       lastAcc = -1;
       lastAcc = -1;
+    } else {    
+      knownIDs.push(data.id);
     }
-    knownIDs.push(data.id);
+
   }
 
   console.log(knownIDs)
@@ -365,8 +387,11 @@ function update_accuracy(){
     })
     .then(data => {
       console.log("Recieved Data:", data)
-      console.log(data.dict1);
-      proccesData(data.dict1);
+
+
+      if (data.dict1.acc != -1){
+        proccesData(data.dict1);
+      }
       if(data.dict2.acc != -1){
         proccesData(data.dict2);  
       }
@@ -451,7 +476,40 @@ function updateSpecificLossFunctionInfo() {
     document.getElementById("specific_loss_function_description").textContent = description;
 }
 
+function udate_follow(){
+  if (followBranch){
+    followBranch = false
+  } else {
+    followBranch = true
+  }
 
+  const data = {follow_branch: followBranch};
+
+  fetch("/update_follow", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    if (response.ok) {
+    } else {
+      console.error("Failed to send follow data.");
+    }
+  })
+  .finally( () => {
+     if(followBranch){
+      follow_Branch_btn.disabled = true
+      follow_Og_btn.disabled = false
+     } else {
+      follow_Branch_btn.disabled = false
+      follow_Og_btn.disabled = true
+     }
+  });
+  
+  
+}
 
 
 
@@ -544,6 +602,8 @@ start_btn.addEventListener("click", start_training)
 stop_btn.addEventListener("click", stop_training)
 continue_btn.addEventListener("click", continue_training)
 reset_btn.addEventListener("click", reset_training)
+follow_Branch_btn.addEventListener("click", udate_follow)
+follow_Og_btn.addEventListener("click", udate_follow)
 
 batch_size_slider.oninput = function() {
   //console.log("Batch size slider value: " + this.value); // Debugging log

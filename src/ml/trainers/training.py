@@ -68,7 +68,7 @@ def get_loss_function(name): # The boolean indicates wether we need to apply the
         raise ValueError(f"Unknown loss function: {name}")
 
 
-def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, doUpdate: bool, endTempThread: dict, queue: Queue = None):
+def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, otherThreadEnding: dict, endTempThread: dict, queue: Queue = None):
     config_path = 'config/training_config.json'
 
     id = threading.get_ident()
@@ -90,6 +90,7 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, d
                 for batch in train_loader:
                     data, target = batch
                     train_step(model, optimizer, data, target, loss_function, cuda, apply_log_softmax)
+                    print(batch_size)
                     test_loss, test_acc = accuracy(model, test_loader, cuda)
                     if queue is not None:
                         queue.put({"acc": test_acc, "loss": test_loss, "id": id})
@@ -102,7 +103,7 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, d
                         time.sleep(0.1)  # Sleep to prevent busy waiting
                         # Check for updates only if stop flag is active
                         if stop['stop']:
-                            if (doUpdate):
+                            if (otherThreadEnding["end"]):
                                 optimizer_params, batch_size, loss_function_name = check_for_updates(config_path)
                                 optimizer = create_optimizer(model, optimizer_params)  # Update optimizer if necessary
                                 loss_function, apply_log_softmax = get_loss_function(loss_function_name)
@@ -116,14 +117,6 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, d
             time.sleep(0.1)  # Sleep if training is stopped
             if (endTempThread["end"]):
                 return
-
-
-
-def copyModel(model):
-
-    new_model = model
-    new_model.load_state_dict(model.state_dict())
-
 
 
 def main(seed):

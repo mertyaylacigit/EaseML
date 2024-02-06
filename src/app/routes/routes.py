@@ -20,7 +20,7 @@ metricsOG = {"acc":  -1,
 metricsNew = {"acc":  -1,
            "loss": -1,"id": -1}
 
-cuda = False
+cuda = torch.cuda.is_available()
 
 metrics = {"dict1": metricsOG, "dict2": metricsNew}
 q = queue.Queue()
@@ -30,6 +30,7 @@ stop_training_flag = {"stop": False} # Use a dictionary with a mutable flag so w
                                      # of immutable objects like stop = False, so stop = {"stop": False} is better/necessary
 kill_flag = {"alive": True}
 
+followBranch = False
 manual_seed(seed)
 np.random.seed(seed)
 model = {}
@@ -38,8 +39,8 @@ thread1 = 0
 current_model_training = 0
 lazyFlag = False
 threads_running = 0
-endOldThreadFlag = {"end": False}
-listeners = []
+endOldThreadFlag1 = {"end": False}
+endOldThreadFlag2 = {"end": False}
 running = True
 
 def listener1():
@@ -73,13 +74,13 @@ def render_playground():
 
 @bp.route("/start_training")
 def start_training():
-  global stop_training_flag, model, current_model, training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, listeners, thread0
+  global stop_training_flag, model, current_model, training, lazyFlag, kill_flag, threads_running, endOldThreadFlag1, thread0, endOldThreadFlag2
 
   model[0] = ConvolutionalNeuralNetwork()  
   lazyFlag = True
 
   # start training process in seperate thread! 
-  thread0 = Thread(target=training, args=(model[0], cuda, 10, stop_training_flag, kill_flag, True, endOldThreadFlag, q))
+  thread0 = Thread(target=training, args=(model[0], cuda, 10, stop_training_flag, kill_flag, endOldThreadFlag2, endOldThreadFlag1, q))
   thread0.start()
   threads_running += 1
 
@@ -104,7 +105,7 @@ def continue_training():
 
 @bp.route("/reset_training")
 def reset_training():
-    global thread1, thread0, kill_flag, lazyFlag, model, current_model, current_model_training, stop_training_flag, threads_running, listeners, running
+    global thread1, thread0, kill_flag, lazyFlag, model, current_model, current_model_training, stop_training_flag, threads_running, running
     kill_flag["alive"] = False
     
     thread0.join()
@@ -133,30 +134,8 @@ def reset_training():
 @bp.route("/update_params", methods=['POST'])
 def update_params():
 
-    global current_model_training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, q2, training, thread1, thread0
+    global current_model_training, lazyFlag, kill_flag, threads_running, endOldThreadFlag1, q2, training, thread1, thread0, endOldThreadFlag2, followBranch
     
-    # copy current modell
-
-    if (lazyFlag):
-        if (threads_running > 1):
-            endOldThreadFlag["end"] = True
-
-            print("waiting for Join")
-            thread1.join()
-            print("joined a Thread")
-            endOldThreadFlag["end"] = False
-            threads_running -= 1
-            
-
-        new_model = copy.deepcopy(model[0])
-        threads_running += 1
-        current_model_training += 1
-
-        model[current_model_training] = new_model
-
-        thread1 = Thread(target=training, args=(model[current_model_training], cuda, 10, stop_training_flag, kill_flag, False, endOldThreadFlag, q2))
-        thread1.start()
-
 
     data = request.json
     try:
@@ -167,12 +146,58 @@ def update_params():
         # Update the config with new values
         current_config.update(data)
 
+        #create new threads
+        if (lazyFlag):
+            if (threads_running > 1):
+                
+                if (followBranch):
+                    endOldThreadFlag1["end"] = True
+
+                    print("waiting for Join")
+                    thread0.join()
+                    print("joined a Thread")
+                    new_model = copy.deepcopy(model[current_model_training])
+                    model[0] = model[current_model_training]
+                    current_model_training += 1
+                    model[current_model_training] = new_model
+                    thread0 = Thread(target=training, args=(model[current_model_training], cuda, 10, stop_training_flag, kill_flag, endOldThreadFlag2, endOldThreadFlag1, q))
+                    thread0.start()
+                else:
+                    endOldThreadFlag2["end"] = True
+                    thread1.join()
+                    print("joined a Thread")
+                    new_model = copy.deepcopy(model[0])
+                    model[current_model_training] = new_model
+                    thread1 = Thread(target=training, args=(model[current_model_training], cuda, 10, stop_training_flag, kill_flag, endOldThreadFlag1, endOldThreadFlag2, q2))
+                    thread1.start()
+            else:
+                new_model = copy.deepcopy(model[0])       
+                thread1 = Thread(target=training, args=(model[current_model_training], cuda, 10, stop_training_flag, kill_flag, endOldThreadFlag1, endOldThreadFlag2, q2))    
+                thread1.start()
+                threads_running += 1
+
+        
+        endOldThreadFlag1["end"] = False
+        endOldThreadFlag2["end"] = False
+
         with open(config_path, 'w') as file:
             json.dump(current_config, file)
 
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+    
+
+@bp.route('/update_follow', methods=['POST'])
+def update_follow():
+    global followBranch
+    request_data = request.get_json() 
+    follow_value = request_data.get('follow_branch')  
+    
+    print("Received follow value:", follow_value)
+    followBranch = follow_value
+
+    return jsonify({'success': True})
     
 @bp.route("/get_current_params")
 def get_current_params():
