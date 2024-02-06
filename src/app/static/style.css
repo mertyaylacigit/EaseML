@@ -84,12 +84,17 @@ nav ul li a {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.parameter-options, .control-buttons, .additional-buttons, .button {
+.parameter-options, .control-buttons, .additional-buttons {
   flex-basis: 30%;
   padding: 10px;
   margin-bottom: 20px;
 }
 
+/* .button {
+  padding: 10px;
+  margin-bottom: 20px;
+}
+ */
 .parameter-options h3, .control-and-animation h3, .additional-buttons h3 {
   margin-bottom: 10px; /* Adjust this value as needed for alignment */
   text-align: left;
@@ -102,7 +107,7 @@ nav ul li a {
   align-items: center;
 }
 
-.control-buttons button, .additional-buttons button, .parameter-options button, .button {
+.control-buttons button, .additional-buttons button, .parameter-options button, .button, #model_selection {
   
   background-color: var(--primary-color);
   color: #FFFFFF;
@@ -113,6 +118,12 @@ nav ul li a {
   transition: background-color 0.3s;
 
 }
+
+#model_selection {
+  height: fit-content;
+  width: fit-content;
+}
+
 .material-symbols-outlined {
   display:flex !important;
 }
@@ -347,16 +358,16 @@ nav ul li a {
   overflow-y: auto; /* Allows scrolling if content overflows */
 }
 
-#button_config_control {
+#button_config_control, #button_model_control {
   display: flex;
   justify-content: space-between;
 }
 
-#config_control {
+#config_control, #model_control {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: fit-content;
+  width: 190px;
 }
 
 .config-list p, .model-list p {

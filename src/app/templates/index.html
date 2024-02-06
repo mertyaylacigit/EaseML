@@ -128,8 +128,12 @@
                     <button id="continue_training"><span class="material-symbols-outlined">
                         resume
                         </span></button>
-                    <br>
-                    <button id="reset_training">Reset Training</button>
+
+                    <button id="reset_training">
+                        <span class="material-symbols-outlined">
+                            restart_alt
+                            </span>
+                    </button>
                 </div>
 
                 <!-- Neural Network Animation -->
@@ -221,12 +225,26 @@
                 <div id="modelList" class="model-list">
                     <p>No models saved yet.</p>
                 </div>
-
-                <button id="save_model">Save Model</button>
-                <button id="remove_model">Remove Model</button>
-                <button id="download_model">Download Model</button>
-                <br>
-                <button id="clear_model_history">Clear Model History</button>        
+                <div id="model_control">
+                    <div id="button_model_control">
+                        <button id="save_model">
+                            <span class="material-symbols-outlined">
+                                save
+                            </span>
+                        </button>
+                        <button id="remove_model">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </button>
+                        <button id="download_model">
+                            <span class="material-symbols-outlined">
+                                download
+                                </span>
+                        </button>
+                    </div>
+                    <button id="clear_model_history">Clear Model History</button>
+                </div>      
             </div>
         </div>
     </div>
