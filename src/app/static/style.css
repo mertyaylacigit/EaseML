@@ -1,9 +1,19 @@
 /* Basic Reset */
+
+/* Farbschema und Grundstile */
+:root {
+  --primary-color: #6200EE; /* Dunkleres Indigo für bessere Sichtbarkeit */
+  --secondary-color: #03DAC6; /* Helles Türkis als Akzent */
+  --background-color: #FFFFFF; /* Weißer Hintergrund für Barrierefreiheit */
+  --text-color: #000000; /* Schwarzer Text für besseren Kontrast */
+  --button-hover-color: #3700B3; /* Dunklerer Indigo für Button-Hover */
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto', Arial, sans-serif; /* Material Design empfiehlt Roboto */
 }
 
 body {
@@ -15,7 +25,7 @@ body {
 
 .navbar {
   background-color: white;
-  color: #007bff;
+  color: var(--primary-color);
   padding: 10px 20px;
   display: flex;
   justify-content: space-between;
@@ -27,7 +37,7 @@ body {
   font-size: 24px;
   font-weight: bold;
   text-decoration: none;
-  color: #007bff;
+  color: var(--primary-color);
 }
 
 .hamburger-menu {
@@ -74,7 +84,7 @@ nav ul li a {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.parameter-options, .control-buttons, .additional-buttons {
+.parameter-options, .control-buttons, .additional-buttons, .button {
   flex-basis: 30%;
   padding: 10px;
   margin-bottom: 20px;
@@ -85,46 +95,60 @@ nav ul li a {
   text-align: left;
 }
 
-.control-buttons button, .additional-buttons button, .parameter-options button, .info-button {
-  background-color: #f7faff; /* Light blue background for a subtle effect */
-  color: #0056b3; /* Blue font color */
-  border: 2px solid #007bff; /* Blue border to match the training control section */
-  padding: 10px 20px;
-  border-radius: 12px; /* Rounded corners for the buttons */
+.config_header {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.control-buttons button, .additional-buttons button, .parameter-options button, .button {
+  
+  background-color: var(--primary-color);
+  color: #FFFFFF;
+  padding: 10px 15px;
+  border-radius: 4px;
+  border: none;
   cursor: pointer;
-  font-size: 16px;
-  transition: box-shadow 0.3s, background-color 0.3s;
-  /* Slight inner shadow for a subtle depth effect */
-  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.05);
-  margin-bottom: 5px;
+  transition: background-color 0.3s;
+
+}
+.material-symbols-outlined {
+  display:flex !important;
+}
+
+.info-button {
+  cursor: pointer;
+}
+
+.info-button:hover {
+  opacity: 0.5;
 }
 
 /* Style for button interaction: active, maintain neumorphic effect */
-.control-buttons button:active, .additional-buttons button:active, .parameter-options button:active, .info-button:active {
-  background-color: #e6e6f0; /* Slightly darker background for pressed state */
-  /* Neumorphism effect for pressed state */
-  box-shadow: inset 4px 4px 6px #d1d9e6, /* Top-left inner shadow */
-              inset -4px -4px 6px #ffffff; /* Bottom-right inner shadow */
+.control-buttons button:active, .additional-buttons button:active, .parameter-options button:active, .button:active {
+  background-color: var(--button-hover-color); /* Verwende die Hover-Farbe für den aktiven Zustand */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); /* Sanfterer Inset-Schatten für den aktiven Zustand */
 }
+
 
 /* Styles for disabled buttons */
 .control-buttons button:disabled, 
 .additional-buttons button:disabled,
-.parameter-options button:disabled, .info-button:disabled {
-  background-color: #e0e0e0;
-  color: #9e9e9e;
-  font-weight: normal; /* Disabled buttons are not bold */
-  border: 2px solid #ccc; /* Lighter border for disabled state */
-  cursor: not-allowed;
-  box-shadow: none; /* No shadow for disabled state */
+.parameter-options button:disabled,
+.button:disabled {
+  background-color: #e0e0e0; /* Helles Grau für deaktivierte Buttons */
+  color: #9e9e9e; /* Dunkelgrau für den Text deaktivierter Buttons */
+  border: none; /* Entferne den Rand */
+  cursor: not-allowed; /* Cursor für nicht verfügbare Aktion */
+  box-shadow: none; /* Kein Schatten für deaktivierte Zustände */
 }
 
 .control-buttons button:not(:disabled):hover, 
 .additional-buttons button:not(:disabled):hover,
-.parameter-options button:not(:disabled):hover, .info-button:not(:disabled):hover {
-  background-color: #dce4f7; /* Even slightly darker on hover */
-  /* Subtle shadow on hover for depth */
-  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.05);
+.parameter-options button:not(:disabled):hover, 
+.button:not(:disabled):hover {
+  background-color: var(--button-hover-color);
 }
 
 
@@ -145,6 +169,12 @@ nav ul li a {
   width: 100%;
 }
 
+.parameter-options input[type=range]::-webkit-slider-runnable-track,
+.parameter-options input[type=range]::-moz-range-track,
+.parameter-options input[type=range]::-ms-fill-upper {
+  color: var(--secondary-color);
+}
+
 .parameter-options span {
   display: block;
   text-align: center;
@@ -163,6 +193,11 @@ nav ul li a {
   padding: 20px;
 }
 
+.chart-header {
+  display: flex;
+  gap: 8px;
+}
+
 .chart-section {
   display: flex;
   justify-content: center;
@@ -170,13 +205,13 @@ nav ul li a {
 }
 
 .chart-container {
-  flex-basis: 45%; /* Adjust as needed */
     margin: 10px;
+    width: min-content;
 }
 
 .chart-section-container {
   display: flex;
-  justify-content: space-around;
+  gap: 32px;
 }
 
 
@@ -204,7 +239,7 @@ nav ul li a {
   padding: 10px;
   margin: 5px;
   font-size: 16px;
-  border: 2px solid #007bff; /* Blue border to match the training control section */
+  border: 2px solid var(--primary-color); /* Blue border to match the training control section */
   border-radius: 4px; /* Rounded corners */
   background-color: #f7faff; /* Light blue background for a subtle effect */
   color: #0056b3; /* Blue font color */
@@ -243,7 +278,7 @@ nav ul li a {
 }
 
 .node {
-  border: 2px solid #007bff;
+  border: 2px solid var(--primary-color);
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -262,7 +297,7 @@ nav ul li a {
 }
 
 @keyframes glow {
-  0%, 100% { background-color: #007bff; }
+  0%, 100% { background-color: var(--primary-color); }
   50% { background-color: transparent; }
 }
 
@@ -312,6 +347,18 @@ nav ul li a {
   overflow-y: auto; /* Allows scrolling if content overflows */
 }
 
+#button_config_control {
+  display: flex;
+  justify-content: space-between;
+}
+
+#config_control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: fit-content;
+}
+
 .config-list p, .model-list p {
   color: #666;
   text-align: center;
@@ -331,12 +378,13 @@ nav ul li a {
 
 
 #training-control {
-  border: 2px solid #007bff; /* Blue border, can be adjusted or removed */
+  border: 2px solid var(--primary-color); /* Blue border, can be adjusted or removed */
   padding: 20px; /* Adjust padding as necessary */
   margin: 10px 0; /* Space above and below the container */
   border-radius: 8px; /* Rounded corners */
   background: #fff; /* Background color */
   box-shadow: inset 0 0 10px #ccc; /* Subtle grey inner glow */
+  height: 400px;
 }
 
 
@@ -344,6 +392,10 @@ nav ul li a {
 /* Style for the slider container */
 .slider-container {
   margin-bottom: 20px; /* Spacing between each slider section */
+}
+
+#batch_size_slider {
+  color: var(--secondary-color);
 }
 
 /* Style for the header containing the label and info button */
@@ -478,20 +530,4 @@ nav ul li a {
 
 #predicted_digit, #probability_div {
   margin: 10px 0; /* Space around each for clarity */
-}
-
-/* Button styles */
-.button {
-  background-color: #f7faff; /* Light blue background */
-  color: #0056b3; /* Blue font color */
-  border: 2px solid #007bff; /* Blue border */
-  padding: 10px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s, border-color 0.3s;
-}
-
-.button:hover {
-  background-color: #dce4f7; /* Slightly darker on hover */
 }

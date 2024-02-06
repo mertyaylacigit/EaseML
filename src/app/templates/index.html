@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>easeML</title>
     <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../static/script.js" defer ></script>
     <script src="../static/history_script.js" defer ></script>
@@ -16,15 +20,6 @@
     <nav class="navbar">
         <div class="left">
             <a href="/" class="easeML">easeML</a>
-            <!--
-            <ul>
-                <li class="playground-button"><a href="/playground">Playground<span class="new-tag">New!</span></a></li>
-            </ul> -->
-        </div>
-        <div class="right">
-            <div class="hamburger-menu">
-                <span>&#9776;</span> <!-- Represents the hamburger icon -->
-            </div>
         </div>
         
     </nav>
@@ -40,13 +35,18 @@
     <div class="main-content">
         <!-- Parameter Options -->
         <div class="parameter-options">
-            <h3>Model Configuration</h3>
-
+            <div class="config_header">   
+                <h3>Model Configuration</h3>
+                <button id="update_params_btn">Update Parameters</button>
+            </div>  
             <!-- Loss Function Selection -->
             <div class="slider-container">
                 <div class="slider-header">
                     <label for="loss_function">Loss Function:</label>
-                    <button class="info-button" onclick="toggleInfo('loss_function_info', this)">▼</button>
+                    
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('loss_function_info', this)">
+                        help
+                    </span>
                 </div>
                 <select id="loss_function" onchange="updateSpecificLossFunctionInfo()">
                     <option value="cross_entropy">Cross Entropy</option>
@@ -67,7 +67,9 @@
                 <div class="slider-header">
                     <label for="batch_size_slider">Batch Size:</label>
                     <!-- Fold-out button with initial arrow symbol -->
-                    <button class="info-button" onclick="toggleInfo('batch_size_info', this)">▼</button>
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('batch_size_info', this)">
+                        help
+                    </span>
                 </div>
                 <!-- Hidden information panel -->
                 <div id="batch_size_info" class="info-panel">
@@ -80,7 +82,9 @@
                 <div class="slider-header">
                     <label for="learning_rate_slider">Learning Rate:</label>
                     <!-- Fold-out button with initial arrow symbol -->
-                    <button class="info-button" onclick="toggleInfo('learning_rate', this)">▼</button>
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('learning_rate', this)">
+                        help
+                    </span>
                 </div>
                 <!-- Hidden information panel -->
                 <div id="learning_rate" class="info-panel">
@@ -93,7 +97,9 @@
                 <div class="slider-header">
                     <label for="momentum_slider">Momentum:</label>
                     <!-- Fold-out button with initial arrow symbol -->
-                    <button class="info-button" onclick="toggleInfo('momentum_slider_info', this)">▼</button>
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('momentum_slider_info', this)">
+                        help
+                    </span>
                 </div>
                 <!-- Hidden information panel -->
                 <div id="momentum_slider_info" class="info-panel">
@@ -102,7 +108,6 @@
                 <input type="range" id="momentum_slider" name="momentum" min="0" max="1" step="0.01" value="0.5">
                 <span id="momentum_value">0.5</span>
             </div>
-            <button id="update_params_btn">Update Parameters</button>
         </div>
 
         <div id="training-control">
@@ -110,9 +115,19 @@
                 <h3>Training Control</h3>
                 <!-- Control Buttons -->
                 <div class="control-buttons">
-                    <button id="start_training">Start Training</button>
-                    <button id="stop_training">Stop</button>
-                    <button id="continue_training">Continue</button>
+                    <button id="start_training">
+                        <span class="material-symbols-outlined">
+                            play_arrow
+                        </span>
+                    </button>
+                    <button id="stop_training">
+                        <span class="material-symbols-outlined">
+                            pause
+                        </span>
+                    </button>
+                    <button id="continue_training"><span class="material-symbols-outlined">
+                        resume
+                        </span></button>
                 </div>
 
                 <!-- Neural Network Animation -->
@@ -177,12 +192,26 @@
                 <div id="configurationList" class="config-list">
                     <p>No configurations saved yet.</p>
                 </div>
-
-                <button id="save_config">Save Configuration</button>
-                <button id="remove_config">Remove Config</button>
-                <button id="load_config">Load Config</button>
-                <br>
-                <button id="clear_config_history">Clear Configuration History</button>
+                <div id="config_control">
+                    <div id="button_config_control">
+                        <button id="save_config">
+                            <span class="material-symbols-outlined">
+                                save
+                            </span>
+                        </button>
+                        <button id="remove_config">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </button>
+                        <button id="load_config">
+                            <span class="material-symbols-outlined">
+                                refresh
+                            </span>
+                        </button>
+                    </div>
+                    <button id="clear_config_history">Clear Configuration History</button>
+                </div>
             </div>
             <div hidden id="model-history">
                 <h3>Model History</h3>
@@ -210,7 +239,9 @@
             <div class="chart-container">
                 <div class="chart-header">
                     <label>Loss:</label>
-                    <button class="info-button" onclick="toggleInfo('loss_info', this)">▼</button>
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('loss_info', this)">
+                        help
+                    </span>
                 </div>
                 <div id="loss_info" class="info-panel">
                     <p>Measurement of how far the model's predictions deviate from the actual values, guiding optimization.</p>
@@ -224,7 +255,9 @@
             <div class="chart-container">
                 <div class="chart-header">
                     <label>Accuracy:</label>
-                    <button class="info-button" onclick="toggleInfo('accuracy_info', this)">▼</button>
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('accuracy_info', this)">
+                        help
+                    </span>                    
                 </div>
                 <div id="accuracy_info" class="info-panel">
                     <p>Proportion of correct predictions made by the model, indicating its overall effectiveness.</p>
