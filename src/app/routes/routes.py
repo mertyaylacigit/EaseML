@@ -43,6 +43,10 @@ threads_running = 0
 endOldThreadFlag = {"end": False}
 listeners = []
 running = True
+followBranch = False
+doUpdate0 = {"update": True}
+doUpdate1 = {"update": False}
+
 
 def listener1():
     print("started listening")
@@ -75,12 +79,12 @@ def render_playground():
 
 @bp.route("/start_training")
 def start_training():
-  global stop_training_flag, model, current_model, training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, listeners, thread0
+  global stop_training_flag, model, current_model, training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, listeners, thread0, doUpdate0
 
   lazyFlag = True
 
   # start training process in seperate thread! 
-  thread0 = Thread(target=training, args=(model[0], cuda, 10, stop_training_flag, kill_flag, True, endOldThreadFlag, q))
+  thread0 = Thread(target=training, args=(model[0], cuda, 10, stop_training_flag, kill_flag, doUpdate0, endOldThreadFlag, q))
   thread0.start()
   threads_running += 1
 
@@ -135,7 +139,7 @@ def reset_training():
 @bp.route("/update_params", methods=['POST'])
 def update_params():
 
-    global current_model_training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, q2, training, thread1, thread0
+    global current_model_training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, q2, training, thread1, thread0, followBranch, doUpdate1, doUpdate0
     
     # copy current modell
 
@@ -149,14 +153,19 @@ def update_params():
             endOldThreadFlag["end"] = False
             threads_running -= 1
             
-
+        
+        if (followBranch):
+            new_model = copy.deepcopy(model[current_model_training])
+            
         new_model = copy.deepcopy(model[0])
+
+
         threads_running += 1
         current_model_training += 1
 
         model[current_model_training] = new_model
 
-        thread1 = Thread(target=training, args=(model[current_model_training], cuda, 10, stop_training_flag, kill_flag, False, endOldThreadFlag, q2))
+        thread1 = Thread(target=training, args=(model[current_model_training], cuda, 10, stop_training_flag, kill_flag, doUpdate1, endOldThreadFlag, q2))
         thread1.start()
 
 

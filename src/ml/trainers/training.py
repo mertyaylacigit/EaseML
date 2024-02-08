@@ -68,7 +68,7 @@ def get_loss_function(name): # The boolean indicates wether we need to apply the
         raise ValueError(f"Unknown loss function: {name}")
 
 
-def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, doUpdate: bool, endTempThread: dict, queue: Queue = None):
+def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, doUpdate: dict, endTempThread: dict, queue: Queue = None):
     config_path = 'config/training_config.json'
 
     id = threading.get_ident()
