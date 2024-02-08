@@ -15,5 +15,6 @@ if __name__ == "__main__":
   print("App started")
   threading.Thread(target=listener1, daemon=True).start()
   threading.Thread(target=listener2, daemon=True).start()
+  print(torch.cuda.is_available())
   #webbrowser.open(f"http://{host}:{port}")
   app.run(host=host, port=port, debug=True) # issue: debug=True causes double-opening browser tab when starting app   
