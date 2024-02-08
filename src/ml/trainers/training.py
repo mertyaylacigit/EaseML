@@ -76,6 +76,7 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, o
 
     optimizer_params, batch_size, loss_function_name = check_for_initial_params(config_path)
     loss_function, apply_log_softmax = get_loss_function(loss_function_name)
+    optimizer = create_optimizer(model, optimizer_params)  # Create optimizer with parameters
 
     while kill['alive']:
         if not stop['stop']:  # If not stopped, start/resume training
@@ -83,18 +84,18 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, o
             if cuda:
                 model.cuda()
 
-            optimizer = create_optimizer(model, optimizer_params)  # Create optimizer with parameters
+            
 
             for epoch in range(n_epochs):
                 batchCounter = 1
                 for batch in train_loader:
                     data, target = batch
                     train_step(model, optimizer, data, target, loss_function, cuda, apply_log_softmax)
-                    print(batch_size)
+                    print(optimizer_params)
                     test_loss, test_acc = accuracy(model, test_loader, cuda)
                     if queue is not None:
                         queue.put({"acc": test_acc, "loss": test_loss, "id": id})
-                    print(f"epoch={epoch}, batch={batchCounter}, test accuracy={test_acc}, loss={test_loss}, ID={id}")
+                    print(f"epoch={epoch}, batch={batchCounter}, test accuracy={test_acc}, loss={test_loss}, ID={id}, Batch_size={batch_size}")
 
                     batchCounter += 1
                     print("batch done")
@@ -104,9 +105,12 @@ def training(model: Module, cuda: bool, n_epochs: int, stop: dict, kill: dict, o
                         # Check for updates only if stop flag is active
                         if stop['stop']:
                             if (otherThreadEnding["end"]):
-                                optimizer_params, batch_size, loss_function_name = check_for_updates(config_path)
-                                optimizer = create_optimizer(model, optimizer_params)  # Update optimizer if necessary
-                                loss_function, apply_log_softmax = get_loss_function(loss_function_name)
+                                pass
+                                #this should never be requiered as everytime you update the model a new thread is created
+                            
+                                #optimizer_params, batch_size, loss_function_name = check_for_updates(config_path)
+                                #optimizer = create_optimizer(model, optimizer_params)  # Update optimizer if necessary
+                                #loss_function, apply_log_softmax = get_loss_function(loss_function_name)
                             
                             else:
                                 if (endTempThread["end"]):

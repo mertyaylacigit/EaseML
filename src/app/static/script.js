@@ -41,7 +41,7 @@ var knownIDs = [-1]
 var chart1Data = false
 var chart2Data = true //more flags to track wheter information has been recieved (not pretty but niether am i)
 var followBranch = false
-
+var numBranches = 1
 function start_training(){
   fetch("/start_training")
     .then(response => {
@@ -163,6 +163,7 @@ function reset_training(){
       momentum_slider.disabled = false;
       loss_function_dropdown.disabled = false;
       update_params_btn.disabled = false;
+      numBranches = 1
       cleanupCharts()
     }) 
 }
@@ -243,6 +244,7 @@ function cleanupCharts(){
 function addNewDatasets(){
 
   chart2Data = false
+  chart1Data = false
   addVerticalLine(last_batch - 1);
   addNewDataset(lossChart);
   addNewDataset(accChart);
@@ -252,32 +254,58 @@ function addNewDatasets(){
 
 
 function addNewDataset(chart) {
-  var label = 'Old Parameter' + refDataset/2;
+  var label = 'Branch' + numBranches;
   var color = getRandomColor()
 
   console.log(refDataset)
-  var existingPoint = {
-    x:last_batch -1,
-    y:chart.data.datasets[refDataset - 2].data[chart.data.datasets[refDataset - 2 ].data.length - 1].y
-  };
 
-  console.log(existingPoint)
-  var newDataset = {
-    label: "Current Model",
-    borderColor: 'rgb(75, 192, 192)',
-    data: [existingPoint],
-    fill: false,
-  };
+  if(followBranch){
 
-  var newDatasetbranch = {
-    label: label,
-    borderColor: color,
-    data: [existingPoint],
-    fill: false,
-  };
+    var existingPoint = {
+      x:last_batch -1,
+      y:chart.data.datasets[refDatasetBranch].data[chart.data.datasets[refDatasetBranch].data.length - 1].y
+    };
+  
+  
+    var newDataset = {
+      label: label,
+      borderColor: color,
+      data: [existingPoint],
+      fill: false,
+    }
 
-  chart.data.datasets.push(newDatasetbranch);
+    refDataset = findLargerInteger(refDataset, refDatasetBranch) + 1 
+    chart.data.datasets.push(newDataset);
+
+  } else {
+
+    var existingPoint = {
+      x:last_batch -1,
+      y:chart.data.datasets[refDataset].data[chart.data.datasets[refDataset].data.length - 1].y
+    };
+
+    var newDataset = {
+      label: label,
+      borderColor: color,
+      data: [existingPoint],
+      fill: false,
+    }
+    refDatasetBranch = findLargerInteger(refDataset, refDatasetBranch) + 1
+    chart.data.datasets.push(newDataset)
+
+  }
+
+
+  
   chart.data.datasets.push(newDataset);
+}
+
+function findLargerInteger(a, b) {
+  if (a > b) {
+      return a;
+  } else {
+      return b;
+  }
 }
 
 
@@ -286,12 +314,16 @@ function proccesData(data){
     if (knownIDs.length == 3){
       if (followBranch){
         chart1Data = false;
-
+        knownIDs[1] = data.id;
+        lastAccOg = -1
+        lastLossOg = -1
+      } else {
+        chart2Data = false;
+        knownIDs[2] = data.id;
+        lastAcc = -1;
+        lastAcc = -1;
       }
-      chart2Data = false;
-      knownIDs.pop();
-      lastAcc = -1;
-      lastAcc = -1;
+
     } else {    
       knownIDs.push(data.id);
     }
@@ -355,6 +387,7 @@ function updateChart(dataPoint, chart, original) {
     chart.data.datasets[refDataset].data.push(point)
   }
   else {
+    console.log(refDatasetBranch)
     chart.data.labels.push(last_batch)
     chart.data.datasets[refDatasetBranch].data.push(point)
   }
@@ -634,8 +667,6 @@ update_params_btn.addEventListener("click", function() {
   };
   if (receviedData)
   {
-    refDataset = refDataset + 2;
-    refDatasetBranch = refDatasetBranch + 2;
     addNewDatasets();
   }
   updateTrainingParams(newParams);
