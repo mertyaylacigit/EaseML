@@ -20,7 +20,7 @@ metricsOG = {"acc":  -1,
 metricsNew = {"acc":  -1,
            "loss": -1,"id": -1}
 
-cuda = False
+cuda = torch.cuda.is_available()
 
 metrics = {"dict1": metricsOG, "dict2": metricsNew}
 q = queue.Queue()
@@ -32,7 +32,11 @@ kill_flag = {"alive": True}
 
 manual_seed(seed)
 np.random.seed(seed)
+
+para_dict1 = {}
+para_dict2 = {}
 model = {}
+model_branches = {}
 model[0] = ConvolutionalNeuralNetwork()  
 selected_model = model[0]
 thread0 = 0
@@ -40,9 +44,10 @@ thread1 = 0
 current_model_training = 0
 lazyFlag = False
 threads_running = 0
-endOldThreadFlag = {"end": False}
 listeners = []
 running = True
+followBranch = False
+
 
 def listener1():
     print("started listening")
@@ -75,12 +80,12 @@ def render_playground():
 
 @bp.route("/start_training")
 def start_training():
-  global stop_training_flag, model, current_model, training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, listeners, thread0
+  global stop_training_flag, model, current_model, training, lazyFlag, kill_flag, threads_running, listeners, thread0, para_dict1
 
   lazyFlag = True
 
   # start training process in seperate thread! 
-  thread0 = Thread(target=training, args=(model[0], cuda, 10, stop_training_flag, kill_flag, True, endOldThreadFlag, q))
+  thread0 = Thread(target=training, args=(model[0], cuda, 10, stop_training_flag, kill_flag, True, para_dict1, q))
   thread0.start()
   threads_running += 1
 
@@ -135,28 +140,48 @@ def reset_training():
 @bp.route("/update_params", methods=['POST'])
 def update_params():
 
-    global current_model_training, lazyFlag, kill_flag, threads_running, endOldThreadFlag, q2, training, thread1, thread0
+    global current_model_training, lazyFlag, kill_flag, threads_running, q2, training, thread1, thread0, followBranch, para_dict1, para_dict2
     
     # copy current modell
 
     if (lazyFlag):
         if (threads_running > 1):
-            endOldThreadFlag["end"] = True
+            kill_flag["alive"] = False
 
             print("waiting for Join")
             thread1.join()
             print("joined a Thread")
-            endOldThreadFlag["end"] = False
-            threads_running -= 1
+            thread0.join()
+            print("joined a Thread")
+            kill_flag["alive"] = True
+            threads_running -= 2
+        else :
+            kill_flag["alive"] = False
+            print("waiting for Join")
+            thread0.join()
+            print("joined a Thread")
+            threads_running += 1
+            kill_flag["alive"] = True
             
+        
+        if (followBranch):
+            new_model = copy.deepcopy(model_branches[current_model_training])
+            new_model_branch = copy.deepcopy(model_branches[current_model_training])
+            para_dict2.update(para_dict2)
+        else:           
+            new_model = copy.deepcopy(model[current_model_training])
+            new_model_branch = copy.deepcopy(model[current_model_training])
+            para_dict2.update(para_dict1)
 
-        new_model = copy.deepcopy(model[0])
-        threads_running += 1
+        threads_running += 2
         current_model_training += 1
 
         model[current_model_training] = new_model
+        model_branches[current_model_training] = new_model_branch
 
-        thread1 = Thread(target=training, args=(model[current_model_training], cuda, 10, stop_training_flag, kill_flag, False, endOldThreadFlag, q2))
+        thread0 = Thread(target=training, args=(model[current_model_training], cuda, 10, stop_training_flag, kill_flag, True, para_dict1, q))
+        thread1 = Thread(target=training, args=(model_branches[current_model_training], cuda, 10, stop_training_flag, kill_flag, False, para_dict2, q2))
+        thread0.start()
         thread1.start()
 
 
@@ -167,10 +192,9 @@ def update_params():
             with open(config_path, 'r') as file:
                 current_config = json.load(file)
 
-            # Update the config with new values
+            print(data)
             current_config.update(data)
-            # Update the config with new values
-            current_config.update(data)
+
 
             with open(config_path, 'w') as file:
                 json.dump(current_config, file)
@@ -186,6 +210,18 @@ def update_params():
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+    
+
+@bp.route('/update_follow', methods=['POST'])
+def update_follow():
+    global followBranch
+    request_data = request.get_json() 
+    follow_value = request_data.get('follow_branch')  
+    
+    print("Received follow value:", follow_value)
+    followBranch = follow_value
+
+    return jsonify({'success': True})
     
 @bp.route("/get_current_params")
 def get_current_params():

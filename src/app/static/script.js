@@ -7,6 +7,8 @@ const ac_chart = document.getElementById("accuracyChart")
 const l_chart = document.getElementById("lossChart")
 const configuration_history = document.getElementById("configuration-history")
 const model_history = document.getElementById("model-history")
+const follow_Branch_btn = document.getElementById("followBranch")
+const follow_Og_btn = document.getElementById("followOg")
 
 // dynamic parameters
 const batch_size_slider = document.getElementById("batch_size_slider")
@@ -21,6 +23,8 @@ const loss_function_dropdown = document.getElementById("loss_function");
 stop_btn.disabled = true
 continue_btn.disabled = true
 reset_btn.disabled = true
+follow_Branch_btn.disabled = true
+follow_Og_btn.disabled = true
 
 //global Parameters
 var last_batch = 0
@@ -32,9 +36,10 @@ var lastAcc = -1
 var lastLoss = -1
 let verLines = []
 var receviedData = false  //lazy Solution but it works
-var knownIDs = [-1]
 var chart1Data = false
 var chart2Data = true //more flags to track wheter information has been recieved (not pretty but niether am i)
+var followBranch = false
+
 
 function start_training(){
   fetch("/start_training")
@@ -62,6 +67,9 @@ function start_training(){
       momentum_slider.disabled = true;
       loss_function_dropdown.disabled = true;
       update_params_btn.disabled = true;
+      loss_function_dropdown.disabled = true;
+      update_params_btn.disabled = true;
+ 
       toggleHistoryUI(false);
       updateCurrentParameters();
     })
@@ -91,6 +99,13 @@ function stop_training(){
       momentum_slider.disabled = false;
       loss_function_dropdown.disabled = false;
       update_params_btn.disabled = false;
+      if (lastAcc != -1){
+        if (followBranch){
+          follow_Og_btn.disabled = false;
+        } else {
+          follow_Branch_btn.disabled = false;
+        }
+      }
       toggleHistoryUI(true);
     })
 }
@@ -122,6 +137,8 @@ function continue_training(){
       update_params_btn.disabled = true;
       configuration_history.disabled = true;
       model_history.disabled = true;
+      follow_Branch_btn.disabled = true;
+      follow_Og_btn.disabled = true;
       toggleHistoryUI(false);
       updateCurrentParameters();
     })  
@@ -147,6 +164,13 @@ function reset_training(){
       momentum_slider.disabled = false;
       loss_function_dropdown.disabled = false;
       update_params_btn.disabled = false;
+      follow_Branch_btn.disabled = true;
+      follow_Og_btn.disabled = true;
+      lastAcc = -1
+      lastLoss = -1
+      lastAccOg = -1
+      lastLossOg = -1
+      chart2Data = true
       cleanupCharts()
     }) 
 }
@@ -183,7 +207,9 @@ function cleanupCharts(){
         },
       y: {
         type: 'linear',
-        position: 'left'
+        position: 'left',
+        suggestedMin: 0,
+        suggestedMax: 100
         }
       },
       plugins: {
@@ -202,7 +228,9 @@ function cleanupCharts(){
           },
         y: {
           type: 'linear',
-          position: 'left'
+          position: 'left',
+          suggestedMin: 0,
+          suggestedMax: 30
           }
         },
         plugins: {
@@ -230,78 +258,88 @@ function addNewDatasets(){
   addVerticalLine(last_batch - 1);
   addNewDataset(lossChart);
   addNewDataset(accChart);
+  refDatasetBranch = findLargerInteger(refDataset, refDatasetBranch) + 1
+  console.log(refDatasetBranch)
   lossChart.update();
   accChart.update();
 }
 
 
 function addNewDataset(chart) {
-  var label = 'Old Parameter' + refDataset/2;
+  var label = 'Old Parameter';
   var color = getRandomColor()
 
+
+  if (chart2Data){
+    chart.data.datasets[refDatasetBranch].data.pop()
+  }
+  if (chart1Data){
+    chart.data.datasets[refDataset].data.pop()
+  }
+
   console.log(refDataset)
-  var existingPoint = {
-    x:last_batch -1,
-    y:chart.data.datasets[refDataset - 2].data[chart.data.datasets[refDataset - 2 ].data.length - 1].y
-  };
 
-  console.log(existingPoint)
+
+  if (followBranch){
+    var existingPoint = {
+      x:last_batch - 1,
+      y:chart.data.datasets[refDatasetBranch].data[chart.data.datasets[refDatasetBranch].data.length - 1].y
+    };
+  } else
+  {
+    var existingPoint = {
+      x:last_batch - 1,
+      y:chart.data.datasets[refDataset].data[chart.data.datasets[refDataset].data.length - 1].y
+    };
+  }
+
   var newDataset = {
-    label: "Current Model",
-    borderColor: 'rgb(75, 192, 192)',
-    data: [existingPoint],
-    fill: false,
-  };
-
-  var newDatasetbranch = {
     label: label,
     borderColor: color,
     data: [existingPoint],
     fill: false,
   };
 
-  chart.data.datasets.push(newDatasetbranch);
+
+  if (followBranch){
+    refDataset = refDatasetBranch
+  }
+
+
   chart.data.datasets.push(newDataset);
+}
+
+function findLargerInteger(a, b) {
+  if (a > b) {
+      return a;
+  } else {
+      return b;
+  }
 }
 
 
 function proccesData(data){
-  if(data.id != -1 && !(knownIDs.includes(data.id))){
-    if (knownIDs.length == 3){
-      chart2Data = false;
-      knownIDs.pop();
-      lastAcc = -1;
-      lastAcc = -1;
-    }
-    knownIDs.push(data.id);
-  }
-
-  console.log(knownIDs)
 
 
       // Checks if point is "new" og Model
-  if (data.id == knownIDs[1]){
-    if((lastAccOg != data.acc || lastLossOg != data.loss) && !chart1Data){
-      updateChart(data.acc, accChart, true);
-      updateChart(data.loss, lossChart, true);
-      lastAccOg = data.acc;
-      lastLossOg = data.loss;
-      receviedData = true;
-      chart1Data = true;
-    }
+  if((lastAccOg != data.dict1.acc || lastLossOg != data.dict1.loss) && !chart1Data){
+    updateChart(data.dict1.acc, accChart, true);
+    updateChart(data.dict1.loss, lossChart, true);
+    lastAccOg = data.dict1.acc;
+    lastLossOg = data.dict1.loss;
+    receviedData = true;
+    chart1Data = true;
   }
 
       // Checks if point is "new" new Model
-  else if (data.id == knownIDs[2]){
-    if((lastAcc != data.acc || lastLoss != data.loss) && !chart2Data){
-      updateChart(data.acc, accChart, false);
-      updateChart(data.loss, lossChart, false);
-      lastAcc = data.acc;
-      lastLoss = data.loss;
-      chart2Data = true;
-    }
+  if((lastAcc != data.dict2.acc || lastLoss != data.dict2.loss) && !chart2Data){
+    updateChart(data.dict2.acc, accChart, false);
+    updateChart(data.dict2.loss, lossChart, false);
+    lastAcc = data.dict2.acc;
+    lastLoss = data.dict2.loss;
+    chart2Data = true;
   }
-  
+
 
   console.log(chart1Data);
   console.log(chart2Data);
@@ -313,9 +351,13 @@ function proccesData(data){
     accChart.update();
     lossChart.update()
     chart1Data = false;
-    if (knownIDs.length == 3){
-      chart2Data = false;
+    chart2Data = false;
+    if (data.dict2.id == -1)
+    {
+      chart2Data = true
     }
+    
+
   }
 }
 
@@ -365,11 +407,7 @@ function update_accuracy(){
     })
     .then(data => {
       console.log("Recieved Data:", data)
-      console.log(data.dict1);
-      proccesData(data.dict1);
-      if(data.dict2.acc != -1){
-        proccesData(data.dict2);  
-      }
+      proccesData(data);
       accuracy_span.textContent = data.acc
     })
 }
@@ -451,7 +489,40 @@ function updateSpecificLossFunctionInfo() {
     document.getElementById("specific_loss_function_description").textContent = description;
 }
 
+function udate_follow(){
+  if (followBranch){
+    followBranch = false
+  } else {
+    followBranch = true
+  }
 
+  const data = {follow_branch: followBranch};
+
+  fetch("/update_follow", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    if (response.ok) {
+    } else {
+      console.error("Failed to send follow data.");
+    }
+  })
+  .finally( () => {
+     if(followBranch){
+      follow_Branch_btn.disabled = true
+      follow_Og_btn.disabled = false
+     } else {
+      follow_Branch_btn.disabled = false
+      follow_Og_btn.disabled = true
+     }
+  });
+  
+  
+}
 
 
 
@@ -477,7 +548,9 @@ accChart = new Chart(ac_chart, {
       },
       y: {
         type: 'linear',
-        position: 'left'
+        position: 'left',
+        suggestedMin: 0,
+        suggestedMax: 100
       }
     },
       plugins: {
@@ -508,7 +581,9 @@ lossChart = new Chart(l_chart, {
         },
       y: {
         type: 'linear',
-        position: 'left'
+        position: 'left',
+        suggestedMin: 0,
+        suggestedMax: 30
         }
       },
       plugins: {
@@ -563,6 +638,8 @@ start_btn.addEventListener("click", start_training)
 stop_btn.addEventListener("click", stop_training)
 continue_btn.addEventListener("click", continue_training)
 reset_btn.addEventListener("click", reset_training)
+follow_Branch_btn.addEventListener("click", udate_follow)
+follow_Og_btn.addEventListener("click", udate_follow)
 
 batch_size_slider.oninput = function() {
   //console.log("Batch size slider value: " + this.value); // Debugging log
@@ -593,8 +670,6 @@ update_params_btn.addEventListener("click", function() {
   };
   if (receviedData)
   {
-    refDataset = refDataset + 2;
-    refDatasetBranch = refDatasetBranch + 2;
     addNewDatasets();
   }
   updateTrainingParams(newParams);
