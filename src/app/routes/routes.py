@@ -111,6 +111,7 @@ def reset_training():
     thread0.join()
     thread1.join()
     model = {}
+    model[0] = ConvolutionalNeuralNetwork()
     current_model_training = 0
     current_model = 0
     thread1 = 0
