@@ -35,9 +35,11 @@ var lastLossOg = -1
 var lastAcc = -1
 var lastLoss = -1
 let verLines = []
-var receviedData = false  //lazy Solution but it works
+var save = 0 // the better way of checken if new datasets are requiered
+//var receviedData = false   i now have a better way of doing this check 
 var chart1Data = false
 var chart2Data = true //more flags to track wheter information has been recieved (not pretty but niether am i)
+var update_params_btn_flag = false // its my Birthday so i am adding more flags
 var followBranch = false
 
 
@@ -98,7 +100,7 @@ function stop_training(){
       learning_rate_slider.disabled = false;
       momentum_slider.disabled = false;
       loss_function_dropdown.disabled = false;
-      update_params_btn.disabled = false;
+      update_params_btn_flag = true;
       if (lastAcc != -1){
         if (followBranch){
           follow_Og_btn.disabled = false;
@@ -139,6 +141,7 @@ function continue_training(){
       model_history.disabled = true;
       follow_Branch_btn.disabled = true;
       follow_Og_btn.disabled = true;
+      update_params_btn_flag = false
       toggleHistoryUI(false);
       updateCurrentParameters();
     })  
@@ -241,7 +244,7 @@ function cleanupCharts(){
       };
 
 
-  receviedData = false;
+  save = 0
   last_batch = 0;
   refDataset = 0;
   refDatasetBranch = -1;
@@ -259,15 +262,15 @@ function addNewDatasets(){
   addNewDataset(lossChart);
   addNewDataset(accChart);
   refDatasetBranch = findLargerInteger(refDataset, refDatasetBranch) + 1
-  console.log(refDatasetBranch)
+  //console.log(refDatasetBranch)
   lossChart.update();
   accChart.update();
 }
 
 
 function addNewDataset(chart) {
-  var label = 'Old Parameter';
-  var color = getRandomColor()
+  var label = 'Old Parameter Branch';
+  var color 
 
 
   if (chart2Data){
@@ -285,12 +288,22 @@ function addNewDataset(chart) {
       x:last_batch - 1,
       y:chart.data.datasets[refDatasetBranch].data[chart.data.datasets[refDatasetBranch].data.length - 1].y
     };
+    if (chart == lossChart){
+      color = 'rgb(195, 0, 0)'
+    } else {
+      color = 'rgb(0, 160, 153)'
+    }
   } else
   {
     var existingPoint = {
       x:last_batch - 1,
       y:chart.data.datasets[refDataset].data[chart.data.datasets[refDataset].data.length - 1].y
-    };
+    }
+    if (chart == lossChart){
+      color = 'rgb(243, 146, 0)'
+    } else {
+      color = 'rgb(0, 0, 139)'
+    }
   }
 
   var newDataset = {
@@ -305,6 +318,10 @@ function addNewDataset(chart) {
     refDataset = refDatasetBranch
   }
 
+  if (refDatasetBranch > 0){
+    chart.data.datasets[refDatasetBranch].label = " "
+  }
+  chart.data.datasets[refDataset].label = "Current Accuracy"
 
   chart.data.datasets.push(newDataset);
 }
@@ -327,7 +344,6 @@ function proccesData(data){
     updateChart(data.dict1.loss, lossChart, true);
     lastAccOg = data.dict1.acc;
     lastLossOg = data.dict1.loss;
-    receviedData = true;
     chart1Data = true;
   }
 
@@ -356,8 +372,9 @@ function proccesData(data){
     {
       chart2Data = true
     }
-    
-
+    if (update_params_btn_flag){
+      update_params_btn.disabled = false
+    }
   }
 }
 
@@ -386,7 +403,7 @@ function addVerticalLine(value) {
     mode: 'vertical',
     scaleID: 'x',
     value: value,
-    borderColor: getRandomColor(),
+    borderColor: 'rgb(0, 0, 0)',
     borderWidth: 2,
     label: {
       content: 'test',
@@ -408,7 +425,10 @@ function update_accuracy(){
     .then(data => {
       console.log("Recieved Data:", data)
       proccesData(data);
-      accuracy_span.textContent = data.acc
+      accuracy_span.textContent = data.dict1.acc
+      if (data.dict2.acc != -1){
+        accuracy_span.textContent += " Branch: " + data.dict2.acc
+      }
     })
 }
 
@@ -534,7 +554,7 @@ accChart = new Chart(ac_chart, {
     labels: [],
     datasets: [{
       label: 'Accuracy',
-      borderColor: 'rgb(75, 192, 192)',
+      borderColor: 'rgb(0, 160, 153)',
       data: [],
       fill: false
     }]
@@ -567,7 +587,7 @@ lossChart = new Chart(l_chart, {
     labels: [],
     datasets: [{
       label: 'Loss',
-      borderColor:'rgb(75, 192, 192)',
+      borderColor:'rgb(192, 0, 0)',
       data: [],
       fill: false
     }]
@@ -668,9 +688,14 @@ update_params_btn.addEventListener("click", function() {
       "batch_size": parseInt(batch_size_slider.value),
       "loss_function": loss_function_dropdown.value
   };
-  if (receviedData)
-  {
+
+  if (last_batch != save){
+    save = last_batch
     addNewDatasets();
+  }
+  else if (save > 0){
+    accChart.data.datasets[refDatasetBranch].label = "Parameter Branch"
+    lossChart.data.datasets[refDatasetBranch].label = "Parameter Branch"
   }
   updateTrainingParams(newParams);
 });
