@@ -302,7 +302,7 @@ function addNewDataset(chart) {
     if (chart == lossChart){
       color = 'rgb(243, 146, 0)'
     } else {
-      color = 'rgb(0, 0, 139)'
+      color = 'rgb(136, 216, 143)'
     }
   }
 
@@ -554,7 +554,7 @@ accChart = new Chart(ac_chart, {
     labels: [],
     datasets: [{
       label: 'Accuracy',
-      borderColor: 'rgb(0, 160, 153)',
+      borderColor: 'rgb(98, 0, 238)',
       data: [],
       fill: false
     }]
@@ -587,7 +587,7 @@ lossChart = new Chart(l_chart, {
     labels: [],
     datasets: [{
       label: 'Loss',
-      borderColor:'rgb(192, 0, 0)',
+      borderColor:'rgb(3, 218, 198)',
       data: [],
       fill: false
     }]

@@ -19,7 +19,8 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="left">
-            <a href="/" class="easeML">easeML</a>
+            <img src="../static/easeML.svg" alt="easeML Logo" class="svg-container">
+            <a href="/" class="easeML">easeML</a>               
         </div>
         
     </nav>
@@ -38,8 +39,6 @@
             <div class="config_header">   
                 <h3>Model Configuration</h3>
                 <button id="update_params_btn">Update Parameters</button>
-                <button id="followBranch">Follow Branch Model</button>
-                <button id="followOg">Follow Original Model</button>
             </div>  
             <!-- Loss Function Selection -->
             <div class="slider-container">
@@ -214,7 +213,7 @@
                         </button>
                         <button id="load_config">
                             <span class="material-symbols-outlined">
-                                refresh
+                                swap_horiz
                             </span>
                         </button>
                     </div>
@@ -290,6 +289,7 @@
             </div>
         </div>
         </div>
+
         <!-- Current Parameters Section -->
         <div class="current-parameters-section">
             <h3>Current Parameters</h3>
@@ -299,6 +299,8 @@
             <p>Batch Size: <span id="current_batch_size">N/A</span></p>
             <p>Learning Rate: <span id="current_learning_rate">N/A</span></p>
             <p>Momentum: <span id="current_momentum">N/A</span></p>
+            <button id="followBranch">Follow Branch Model</button>
+            <button id="followOg">Follow Original Model</button>
         </div>
     </div>
 
