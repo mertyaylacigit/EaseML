@@ -1,0 +1,63 @@
+
+.body {
+  display: flex;
+  gap: 40px;
+  padding: 20px;
+  background-color: white;
+  margin: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  background-color: #f7faff; /* Light blue background for a subtle effect */
+  color: #0056b3; /* Blue font color */
+  border: 2px solid #007bff; /* Blue border to match the training control section */
+  padding: 10px 20px;
+  border-radius: 12px; /* Rounded corners for the buttons */
+  cursor: pointer;
+  font-size: 16px;
+  transition: box-shadow 0.3s, background-color 0.3s;
+  /* Slight inner shadow for a subtle depth effect */
+  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.05);
+  margin-bottom: 5px;
+}
+
+
+.canvas {
+  display: flex;
+  gap: 30px;
+}
+
+canvas {
+  border: 1px solid #000;
+}
+
+.canvas-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#clearButton {
+  margin-top: 10px;
+}
+
+#predicted_digit div {
+  width: 100px; /* Adjust the size as needed */
+  height: 100px; /* Adjust the size as needed */
+  background-color: #e0e0e0; /* Square background color */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 100px; /* Adjust the size as needed */
+  font-family: Arial, sans-serif;
+  color: #000; /* Digit color */
+  border: 2px solid #000; /* Square border */
+}
+
+.canvas .classifier {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

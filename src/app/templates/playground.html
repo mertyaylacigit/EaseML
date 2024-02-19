@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>easeML</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/playground_style.css">
+    <script src="../static/playground.js" defer></script>
+
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="left">
+            <a href="/" class="easeML">easeML</a>
+            <ul>
+                <li class="playground-button"><a href="/playground">Playground<span class="new-tag">New!</span></a></li>
+            </ul>
+        </div>
+        <div class="right">
+            <div class="hamburger-menu">
+                <span>&#9776;</span> <!-- Represents the hamburger icon -->
+            </div>
+        </div>  
+    </nav>
+
+    <div class="body">
+      <div class="canvas">
+        <canvas id="drawingCanvas" width="280" height="280" ></canvas>
+        <div class="canvas-right">
+          <div class="other_buttons">
+            <button id="clearButton">Clear</button>
+          </div>
+
+          <div class="classifier">
+            <div id="predicted_digit"> <div id="predicted_digit_inner"></div> </div>
+            <div id="probability_div">Probability: <span id="probability"></span></div>
+            <button id="predict">Predict</button>
+          </div>
+
+        </div>
+        <div>
+          <canvas hidden id="compressedCanvas" width="28" height="28" ></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    </script>
+</body>
+</html>

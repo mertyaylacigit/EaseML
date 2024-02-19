@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>easeML</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../static/script.js" defer ></script>
+    <script src="../static/history_script.js" defer ></script>
+    <script src="../static/playground.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="left">
+            <img src="../static/easeML.svg" alt="easeML Logo" class="svg-container">
+            <a href="/" class="easeML">easeML</a>               
+        </div>
+        
+    </nav>
+
+    <!-- Introduction Section -->
+    <div class="introduction-section">
+        <span class="close-btn">&times;</span> <!-- Close button -->
+        <h2>Welcome to easeML</h2>
+        <p>This platform allows you to explore and interact with machine learning models in a user-friendly environment. Here, you can train models, make predictions, and see how different parameters affect the outcomes. The models are using the MNIST-dataset for training, which is a collection of hand-drawn digits, widely used for training and testing in the field of machine learning. Dive into the playground to test your MNIST digit recognition model, experiment with configurations, and learn more about the world of machine learning.</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Parameter Options -->
+        <div class="parameter-options">
+            <div class="config_header">   
+                <h3>Model Configuration</h3>
+                <button id="update_params_btn">Update Parameters</button>
+            </div>  
+            <!-- Loss Function Selection -->
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="loss_function">Loss Function:</label>
+                    
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('loss_function_info', this)">
+                        help
+                    </span>
+                </div>
+                <select id="loss_function" onchange="updateSpecificLossFunctionInfo()">
+                    <option value="cross_entropy">Cross Entropy</option>
+                    <option value="nll_loss">Negative Log Likelihood</option>
+                    <!-- Add other loss functions as needed -->
+                </select>
+            </div>
+
+            <!-- Specific Infobox for Chosen Loss Function -->
+            <div id="loss_function_info" class="info-panel" style="display: none;">
+                <p>Loss functions measure how well the model performs. Different functions are suitable for different types of tasks.</p>
+                <p id="specific_loss_function_description">Select a loss function to see more details here.</p>
+            </div>
+
+
+            <!-- Other parameters -->
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="batch_size_slider">Batch Size:</label>
+                    <!-- Fold-out button with initial arrow symbol -->
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('batch_size_info', this)">
+                        help
+                    </span>
+                </div>
+                <!-- Hidden information panel -->
+                <div id="batch_size_info" class="info-panel">
+                    <p>Batch size determines the number of samples processed before the model is updated.</p>
+                </div>
+                <input type="range" id="batch_size_slider" name="batch_size" min="1" max="512" value="256">
+                <span id="batch_size_value">256</span>
+            </div>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="learning_rate_slider">Learning Rate:</label>
+                    <!-- Fold-out button with initial arrow symbol -->
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('learning_rate', this)">
+                        help
+                    </span>
+                </div>
+                <!-- Hidden information panel -->
+                <div id="learning_rate" class="info-panel">
+                    <p>The speed at which a model learns; a higher rate can hasten learning but risk overshooting optimal solutions.</p>
+                </div>
+                <input type="range" id="learning_rate_slider" name="learning_rate" min="0.01" max="1" step="0.01" value="0.3">
+                <span id="learning_rate_value">0.3</span>
+            </div>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="momentum_slider">Momentum:</label>
+                    <!-- Fold-out button with initial arrow symbol -->
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('momentum_slider_info', this)">
+                        help
+                    </span>
+                </div>
+                <!-- Hidden information panel -->
+                <div id="momentum_slider_info" class="info-panel">
+                    <p>A technique to accelerate the model's learning, particularly helpful in navigating ravines and avoiding local minima.</p>
+                </div>
+                <input type="range" id="momentum_slider" name="momentum" min="0" max="1" step="0.01" value="0.5">
+                <span id="momentum_value">0.5</span>
+            </div>
+        </div>
+
+        <div id="training-control">
+            <div class="control-and-animation">
+                <h3>Training Control</h3>
+                <!-- Control Buttons -->
+                <div class="control-buttons">
+                    <button id="start_training">
+                        <span class="material-symbols-outlined">
+                            play_arrow
+                        </span>
+                    </button>
+                    <button id="stop_training">
+                        <span class="material-symbols-outlined">
+                            pause
+                        </span>
+                    </button>
+                    <button id="continue_training"><span class="material-symbols-outlined">
+                        resume
+                        </span></button>
+
+                    <button id="reset_training">
+                        <span class="material-symbols-outlined">
+                            restart_alt
+                            </span>
+                    </button>
+                </div>
+
+                <!-- Neural Network Animation -->
+                <div id="neuralNetworkAnimation" class="neural-network" style="display: none;">
+                    <!-- Layer 1 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                    <!-- Repeat for additional layers (2-5) with different numbers of nodes -->
+                    <!-- Layer 2 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                    <!-- Layer 3 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                    <!-- Layer 4 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                    <!-- ... additional layers ... -->
+                    <!-- Layer 5 -->
+                    <div class="node-row">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <!-- Add more nodes as needed -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration area / Additional area -->
+        <div class="additional-buttons">
+            <div class="history-selector">
+                <button id="select_config_btn">Configuration</button>
+                <button id="select_model_btn">Model</button>
+            </div>
+            <div id="configuration-history">
+                <h3>Configuration History</h3>
+                <!-- Configuration List Box -->
+                <div id="configurationList" class="config-list">
+                    <p>No configurations saved yet.</p>
+                </div>
+                <div id="config_control">
+                    <div id="button_config_control">
+                        <button id="save_config">
+                            <span class="material-symbols-outlined">
+                                save
+                            </span>
+                        </button>
+                        <button id="remove_config">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </button>
+                        <button id="load_config">
+                            <span class="material-symbols-outlined">
+                                swap_horiz
+                            </span>
+                        </button>
+                    </div>
+                    <button id="clear_config_history">Clear Configuration History</button>
+                </div>
+            </div>
+            <div hidden id="model-history">
+                <h3>Model History</h3>
+                <!-- Configuration List Box -->
+                <div id="modelList" class="model-list">
+                    <p>No models saved yet.</p>
+                </div>
+                <div id="model_control">
+                    <div id="button_model_control">
+                        <button id="save_model">
+                            <span class="material-symbols-outlined">
+                                save
+                            </span>
+                        </button>
+                        <button id="remove_model">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </button>
+                        <button id="download_model">
+                            <span class="material-symbols-outlined">
+                                download
+                                </span>
+                        </button>
+                    </div>
+                    <button id="clear_model_history">Clear Model History</button>
+                </div>      
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Monitor / Analysis -->
+    <div class="training-monitor">
+        <div class="monitor-container">
+        <h3>Training Monitor</h3>
+          <!-- Charts -->
+          <div class="chart-section-container">
+            <!-- Loss Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <label>Loss:</label>
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('loss_info', this)">
+                        help
+                    </span>
+                </div>
+                <div id="loss_info" class="info-panel">
+                    <p>Measurement of how far the model's predictions deviate from the actual values, guiding optimization.</p>
+                </div>
+                <div class="chart-content">
+                    <canvas id="lossChart"></canvas>
+                </div>
+            </div>
+        
+            <!-- Accuracy Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <label>Accuracy:</label>
+                    <span class="material-symbols-outlined info-button" onclick="toggleInfo('accuracy_info', this)">
+                        help
+                    </span>                    
+                </div>
+                <div id="accuracy_info" class="info-panel">
+                    <p>Proportion of correct predictions made by the model, indicating its overall effectiveness.</p>
+                </div>
+                <div class="chart-content">
+                    <canvas id="accuracyChart"></canvas>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Current Parameters Section -->
+        <div class="current-parameters-section">
+            <h3>Current Parameters</h3>
+            <p> </p>
+            <p>Accuracy: <span id="accuracy">N/A</span></p>
+            <p>Loss Function: <span id="current_loss_function">N/A</span></p>
+            <p>Batch Size: <span id="current_batch_size">N/A</span></p>
+            <p>Learning Rate: <span id="current_learning_rate">N/A</span></p>
+            <p>Momentum: <span id="current_momentum">N/A</span></p>
+            <button id="followBranch">Follow Branch Model</button>
+            <button id="followOg">Follow Original Model</button>
+        </div>
+    </div>
+
+    <!-- Playground Section -->
+    <div id="playground-section" class="playground">
+        <h3>Playground</h3>
+        <div class="playground-content">
+            <!-- Left: MNIST Dataset Explanation -->
+            <div class="mnist-explanation">
+                <h4>Try your model with your own digits!</h4>
+                <p>The MNIST dataset is a collection of hand-drawn digits, widely used for training and testing in the field of machine learning. In this playground, you have the opportunity to test your trained model. Simply draw a digit in the canvas and click 'Predict' to see how well your model recognizes hand-drawn digits.</p>
+            </div>
+
+            <!-- Center: Drawing Canvas and Control Buttons -->
+            <div class="playground-canvas-and-controls">
+                <canvas id="drawingCanvas" width="280" height="280"></canvas>
+                <div class="canvas-buttons">
+                    <button id="clearButton" class="button">Clear</button>
+                    <button id="predict" class="button">Predict</button>
+                    <select id="model_selection" onchange="updateSelectedModel(this.value)">
+                        <option value="current_model">Current Model</option>
+                        <option value="model_pretrained">Pretrained Model</option>
+                    </select>
+                </div>
+                <canvas hidden id="compressedCanvas" width="28" height="28"></canvas>
+            </div>
+
+            <!-- Right: Prediction Result and Probability -->
+            <div class="playground-results">
+                <div class="prediction-result">
+                    <div id="predicted_digit">Prediction: <span id="predicted_digit_inner"></span></div>
+                    <div id="probability_div">Probability: <span id="probability"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const neuralNetworkAnimation = document.getElementById('neuralNetworkAnimation');
+
+            neuralNetworkAnimation.style.display = 'flex';
+
+            let newParams = {
+            "optimizer_params": {
+                "type": "SGD",
+                "args": {
+                "lr": 0.3,
+                "momentum": 0.5
+                }
+            },
+            "batch_size": 256,
+            "loss_function": "cross_entropy"
+            };
+            updateTrainingParams(newParams); // Initialize parameter config
+            updateSpecificLossFunctionInfo();
+        };
+    </script>
+</body>
+</html>
